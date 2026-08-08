@@ -1,0 +1,9 @@
+{
+  "description": "Skills that /project-init copies into a target repo's .claude/skills/ so the core workflow is usable in that repo's cloud sessions even before — or without — the cloud bootstrap clone completes. Keep this list small: it is the offline-safe floor, not the whole stack. The full stack still arrives via scripts/cloud-bootstrap.sh.",
+  "skills": [
+    "goodmorning",
+    "handoff",
+    "operating",
+    "project-init"
+  ]
+}

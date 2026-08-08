@@ -1,0 +1,59 @@
+# <Repo Name> — Agent Guide
+
+> Response style is governed globally by `~/.claude/CLAUDE.md` (<100 tokens default, no preamble, no recap, caveman tone, one-screen max). Override only if this repo has a genuine reason to be more verbose (e.g., teaching context).
+
+## Overview
+
+<One-paragraph description: what this repo is, who uses it, what it produces.>
+
+## Stack tier
+
+Tier: <0|1|2|3|4|5>
+See `.claude/stack-config.json` for the active subagents and overrides for this project.
+
+## Tech stack
+
+<List only what's not obvious from package.json / cargo.toml / etc. If everything's discoverable from manifests, delete this section.>
+
+## ⚠️ Operational facts (the AI can't infer these from code)
+
+### Infrastructure access
+
+<How to authenticate, where secrets live, what API tokens are needed and from where (Keychain item names).>
+
+### Deploy
+
+<Exact deploy command(s). What NOT to use and why (e.g., "Never use `supabase functions deploy` — path mismatch").>
+
+### Past-failure warnings
+
+<Lessons learned from real incidents. Each line should pass Liu's test: "Would removing this cause Claude to make a mistake it couldn't recover from?">
+
+Examples:
+- "Re-enrichment scripts must MERGE with existing data, never overwrite. Past regression: 90% → 34% coverage."
+- "Never write to `LEGACY_EXTERNAL_USER_ID` (legacy, unsuffixed); broke a downstream data backfill on 2026-05-02."
+
+### Domain mode
+
+<If this repo is financial-code, schema-migration, or deploy-sensitive, declare it here. The foreman will route adversarial review accordingly.>
+
+## Shared conventions
+
+<If this repo follows org-wide conventions enforced via a shared package or template, name them here so the AI uses them instead of reinventing. Example: "Auth — wrap the app in `<AcmeClerkProvider>` from `@acme/auth`, never a raw `<ClerkProvider>`." Delete this section if the repo has no shared-convention dependencies.>
+
+## Repo family
+
+<If this repo is part of a family of related repos, link them and clarify which one owns schema, secrets, etc.>
+
+## Related ADRs
+
+- `docs/ADRs/001-...md` — <decision>
+- `docs/ADRs/002-...md` — <decision>
+
+## Related runbooks
+
+- `docs/runbooks/<function-name>.md` — <when to use>
+
+## Onboarding
+
+New here? See `docs/ONBOARDING.md` first.

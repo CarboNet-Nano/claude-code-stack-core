@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-config-schema.json",
+  "title": "Stack Project Configuration",
+  "description": "Per-project configuration for Claude Code Stack. Lives at <project>/.claude/stack-config.json. Created by /project-init, edited by /default-edit project and shortcut skills.",
+  "type": "object",
+  "required": ["stack_version", "stack_tier", "purpose", "created"],
+  "properties": {
+    "stack_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the stack this config was created against."
+    },
+    "stack_tier": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Active stack tier (0=Foundation through 5=Local+Offline)."
+    },
+    "purpose": {
+      "type": "string",
+      "description": "One-line description of what this project is for."
+    },
+    "created": { "type": "string", "format": "date" },
+    "last_modified": { "type": "string", "format": "date" },
+    "orchestration_mode": {
+      "type": "string",
+      "enum": ["main-thread", "agent-teams", "hybrid", "dynamic-workflows"],
+      "default": "main-thread",
+      "description": "v1.1: How foreman dispatches subagents. main-thread is trusted default; agent-teams uses Anthropic's experimental Agent Teams; hybrid mixes (main-thread critical path + parallel review/audit via teams); dynamic-workflows uses Opus 4.8's research-preview workflow runtime for read-only fan-out, gated behind /cost-gate (v1.2)."
+    },
+    "strict_mode": {
+      "type": "boolean",
+      "default": true,
+      "description": "If true, foreman refuses to dispatch in projects without stack-config.json."
+    },
+    "domain_mode": {
+      "description": "Activates extra safety rules in foreman. null = none. A bare string is the single-mode form (unchanged, still canonical for one mode). An array declares multiple simultaneously active modes (ADR-053); forced review chains are then scoped to touched paths via domain_mode_paths.",
+      "oneOf": [
+        {
+          "type": ["string", "null"],
+          "enum": ["financial-code", "schema-migration", "deploy", "ui-design", "data-operation", null]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["financial-code", "schema-migration", "deploy", "ui-design", "data-operation"]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      ]
+    },
+    "domain_mode_paths": {
+      "type": "object",
+      "description": "ADR-053: per-mode path globs scoping which changes activate that mode's forced review chain. Glob semantics are identical to guards.paths (ADR-049): project-relative, bash `case` match after ** -> * normalization. A declared mode ABSENT from this object is UNSCOPED and therefore always active. permissions-compile.sh evaluates NO glob here, but it DOES read this object's KEYS: per ADR-053 D6-revised clause 2, a mode listed here has a conditional review chain and its overlay's mcp_tool_denies suppression is withheld, so the static deny stays. Mapping schema-migration or deploy therefore has a permission consequence; mapping ui-design, financial-code or data-operation has none. A key naming a known mode that is NOT currently declared in domain_mode is dead config: ignored with a warning, never a compile failure (ADR-053 round 3). A key that is not a known mode at all is refused (exit 3). The set of keys that ARE declared modes is part of the consent scope hash, so adding or removing one invalidates any multi_mode_suppression_ack recorded against the old shape. A key whose VALUE is not a non-empty array of strings is drift, not a failure: the KEY IS RETAINED (the mode stays scope-incoherent and its suppression stays withheld), the globs are ignored, and the mode becomes always-active on the routing plane (ADR-053 round 4). domain_mode_paths absent, null or {} is valid and a no-op. The consent scope hash covers {declared modes, declared-mode keys of this object, required_approvals ∩ {pre-schema-change, pre-deploy}} — glob values and unrelated gates are excluded by design.",
+      "propertyNames": {
+        "enum": ["financial-code", "schema-migration", "deploy", "ui-design", "data-operation"]
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" },
+        "minItems": 1,
+        "uniqueItems": true
+      }
+    },
+    "sensitivity": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["normal", "sensitive", "confidential"],
+          "default": "normal"
+        },
+        "notes": { "type": "string" }
+      },
+      "required": ["level"]
+    },
+    "active_subagents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Subagents enabled for this project. Empty array means use tier defaults."
+    },
+    "required_approvals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["pre-merge", "pre-deploy", "pre-schema-change", "pre-bulk-job"]
+      }
+    },
+    "model_overrides": {
+      "type": "object",
+      "description": "Per-subagent model overrides. Keys are subagent names; values are model identifiers from model-routing.json.",
+      "additionalProperties": { "type": "string" }
+    },
+    "skill_overrides": {
+      "type": "object",
+      "description": "Per-skill behavioral overrides.",
+      "additionalProperties": true
+    },
+    "review": {
+      "type": "object",
+      "description": "ADR-030: adversarial-review transport settings (Tier 2+). Read by scripts/lib/openai-review.sh.",
+      "properties": {
+        "codex_transport": {
+          "type": "string",
+          "enum": ["api", "cli"],
+          "default": "api",
+          "description": "How the OpenAI/GPT-5.5 review family is reached: 'api' (default — OpenAI API via oair_call) or 'cli' (codex exec with automatic API fallback). Precedence: env REVIEW_CODEX_TRANSPORT > this > default 'api'."
+        }
+      },
+      "additionalProperties": false
+    },
+    "cost_protection": {
+      "type": "object",
+      "properties": {
+        "per_session_alert_usd": { "type": ["number", "null"], "minimum": 0 },
+        "per_day_alert_usd": { "type": ["number", "null"], "minimum": 0 },
+        "per_session_hard_cap_usd": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "brevity": {
+      "type": "object",
+      "description": "v1.2: Per-project tuning for the brevity-drift UserPromptSubmit hook (hooks/brevity-drift.sh). Absent -> the hook uses its built-in defaults (enabled, 120 words / 6 sentences). Any field missing or non-numeric falls back to that default.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "If false, the brevity-drift hook stays silent for this project (e.g. docs- or prose-heavy repos)."
+        },
+        "word_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 120,
+          "description": "Word count above which the assistant's last response triggers a brevity correction."
+        },
+        "sentence_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6,
+          "description": "Sentence count above which the assistant's last response triggers a brevity correction."
+        }
+      },
+      "additionalProperties": false
+    },
+    "session_prefs": {
+      "type": "object",
+      "description": "v1.2: Project-level default session preferences offered by /session, /goodmorning, /project-init. Live session overrides are written to ~/.claude/session-state/current-prefs.json; this block is the project fallback. Precedence: session-state > this > stack-defaults.session_prefs_defaults > built-in.",
+      "properties": {
+        "communication_style": { "type": "string", "enum": ["terse", "balanced", "thorough"], "default": "balanced", "description": "Maps to the brevity-drift word/sentence budgets." },
+        "model_effort": { "type": "string", "enum": ["minimal", "fast", "balanced", "thorough", "max"], "default": "balanced", "description": "Opus 4.8 effort preference for the session (5-point, ADR-022). Legacy fast/balanced/max remain valid (subset)." },
+        "explanation_verbosity": { "type": "string", "enum": ["minimal", "normal", "teaching"], "default": "normal" },
+        "orchestration_mode": { "type": "string", "enum": ["main-thread", "agent-teams", "hybrid", "dynamic-workflows"], "description": "Session orchestration override; falls back to top-level orchestration_mode if unset." },
+        "cost_alert_sensitivity": { "type": "string", "enum": ["relaxed", "normal", "strict"], "default": "normal" },
+        "passive_suggest": { "type": "boolean", "default": true, "description": "When true, dispatch-nudge.sh appends a pointer to the recommend-capabilities engine. Set to false to silence the recommender pointer while keeping the /foreman//dispatch routing nudge." },
+        "simple_talk": { "type": "string", "enum": ["off", "plain", "caveman"], "default": "off", "description": "v1.3 (ADR-032): plainness/wording modifier, orthogonal to communication_style (which sets length). off = no change; plain = plain words, no jargon; caveman = terse caveman phrasing. Injected each turn by hooks/simple-talk.sh." },
+        "model_fit_receipt": { "type": "string", "enum": ["off", "on"], "default": "on", "description": "v1.3 (ADR-033): post-session model-fit receipt. on (default) = at session end, print one retrospective line naming actual cost/model, the session's workload shape, and a cheaper/stronger alternative if the ratio-based signal is clear. off = no receipt; the main-session accrual hook (hooks/model-fit-turn.sh) writes nothing." },
+        "auto_offer_loop": { "type": "boolean", "default": true, "description": "When true, hooks/loop-shape-nudge.sh asks (via AskUserQuestion) whether to run a loop-shaped request as a governed loop, once per session. This means the assistant ASKS — it never starts a loop on its own. Set false to silence the ask entirely." },
+        "auto_offer_advisor_pair": { "type": "boolean", "default": true, "description": "ADR-052: when true, hooks/advisor-pair-nudge.sh asks (via AskUserQuestion) to switch to the ladder-recommended advisor pairing whenever the effective model/advisorModel pair changes since last observed and no longer matches model-routing.json's model_fit.tier_ladder recommendation. The hook never writes settings.json itself (ADR-042 D-2) — it only tells the assistant to ask, and the assistant only tells the user which native /advisor command to run. Set false to silence the ask entirely." }
+      },
+      "additionalProperties": false
+    },
+    "loop_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Governance for autonomous loops (ADR-019). Defaults ship safe; tier raises the ceiling.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "default_autonomy": { "type": "string", "enum": ["checkpoint", "bounded-checkpoint", "bounded-autonomous"], "default": "checkpoint" },
+        "autonomy_ceiling": { "type": "string", "enum": ["checkpoint", "bounded-checkpoint", "bounded-autonomous"], "default": "checkpoint" },
+        "max_iterations": { "type": "integer", "minimum": 1, "default": 25 },
+        "max_recursion_depth": { "type": "integer", "minimum": 1, "default": 5, "description": "ADVISORY in Phase 1: the runtime does not enforce fan-out/recursion depth; max_iterations is the hard cap. Phase 2 will enforce this." },
+        "per_run_budget_usd": { "type": ["number", "null"], "default": 5, "description": "Between-iteration advisory cap in Phase 1: cost is accrued from subagent-runs.jsonl at each Stop-hook invocation and compared before the next iteration. Does NOT stop a within-iteration runaway (Phase 2 live monitor closes that gap)." },
+        "timeout_minutes": { "type": ["integer", "null"], "default": 180 },
+        "no_progress_exit": { "type": "boolean", "default": true },
+        "require_external_termination": { "type": "string", "enum": ["auto", "always", "never"], "default": "auto" },
+        "commit_per_iteration": { "type": "boolean", "default": false },
+        "irreversible_actions_break_loop": { "type": "boolean", "default": true },
+        "level": { "type": ["string", "null"], "enum": ["L1", "L2", "L3", "L4", null], "default": null, "description": "ADR-047: optional named preset from config/loop-levels.json, materialized by /loop-level into the literal fields above (max_iterations/per_run_budget_usd/timeout_minutes/autonomy_ceiling/default_autonomy) plus the paired cost_protection values. null = no level selected; the literal fields above are read as-is (this is the out-of-the-box state for every new project — see templates/stack-config.template.json). Purely a human-readable label for 'which preset was last applied' — loop-engineer/loop_lib.sh/loop-stop.sh/loop-cost-monitor.sh never read this field, only the literal fields it materializes." }
+      }
+    },
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,62}$",
+      "description": "M3 (ADR-034): tenant this project belongs to. Written by /project-init when a tenant pack is installed; matches tenant.json tenant_id."
+    },
+    "workflow_roster": {
+      "type": "string",
+      "enum": ["warn", "block", "off"],
+      "default": "warn",
+      "description": "v1.2: Controls hooks/workflow-roster-check.sh. 'warn' (default): write-heavy Workflow runs naming no roster agentType emit a non-blocking system-reminder. 'block': such runs are denied (permissionDecision:deny). 'off': no warn/deny, but the run is still logged. Absent or invalid -> 'warn'. No auto-escalation from strict_mode/sensitivity (ADR-016)."
+    },
+    "guards": {
+      "type": "object",
+      "description": "ADR-057: rollout-mode overrides for the stack's own gate hooks, keyed by guard name. Mirrors stack-defaults-schema.json's guards block, which supplies the fallback when this project has no such key. usage_check_gate (usage-check gate): off = no enforcement, warn = log-only (never blocks), on = blocking. Absent here falls back to ~/.claude/stack-defaults.json's guards.usage_check_gate, then to the built-in default (warn).",
+      "properties": {
+        "usage_check_gate": { "type": "string", "enum": ["off", "warn", "on"], "default": "warn" }
+      },
+      "additionalProperties": true
+    },
+    "change_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "setting", "old_value", "new_value", "reason", "scope", "invoked_via"],
+        "properties": {
+          "date": { "type": "string", "format": "date-time" },
+          "setting": { "type": "string", "description": "Dot-path of changed setting" },
+          "old_value": {},
+          "new_value": {},
+          "reason": { "type": "string" },
+          "scope": { "type": "string", "enum": ["project", "global"] },
+          "also_updated_global": { "type": "boolean" },
+          "invoked_via": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

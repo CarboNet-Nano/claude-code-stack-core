@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "wiredAliases": {
+    "tavily": ["npm:tavily-mcp", "gh:tavily-ai/tavily-mcp"],
+    "exa": ["gh:exa-labs/exa-mcp-server"],
+    "context7": ["npm:@upstash/context7-mcp", "gh:upstash/context7"],
+    "playwright": ["gh:microsoft/playwright-mcp"],
+    "figma": ["gh:figma/figma-mcp"],
+    "sentry": ["npm:@sentry/mcp-server", "gh:getsentry/sentry-mcp"]
+  },
+  "ignored": {}
+}

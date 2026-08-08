@@ -1,0 +1,126 @@
+{
+  "tier": 4,
+  "name": "Self-Improving",
+  "description": "3 meta subagents + monthly model + perf audits. Requires 30 days of subagent_runs data to be meaningful.",
+  "extends": "tier-3",
+  "files": {
+    "global": [
+      {
+        "from": "agents/historian.md",
+        "to": "~/.claude/agents/historian.md"
+      },
+      {
+        "from": "agents/librarian.md",
+        "to": "~/.claude/agents/librarian.md"
+      },
+      {
+        "from": "agents/estimator.md",
+        "to": "~/.claude/agents/estimator.md"
+      },
+      {
+        "from": "skills/model-audit/SKILL.md",
+        "to": "~/.claude/skills/model-audit/SKILL.md"
+      },
+      {
+        "from": "skills/agent-performance-review/SKILL.md",
+        "to": "~/.claude/skills/agent-performance-review/SKILL.md"
+      },
+      {
+        "from": "skills/effort-eval/SKILL.md",
+        "to": "~/.claude/skills/effort-eval/SKILL.md"
+      },
+      {
+        "from": "skills/model-eval/SKILL.md",
+        "to": "~/.claude/skills/model-eval/SKILL.md"
+      },
+      {
+        "from": "tools/pm/package.json",
+        "to": "~/.claude/tools/pm/package.json"
+      },
+      {
+        "from": "tools/pm/bin.mjs",
+        "to": "~/.claude/tools/pm/bin.mjs",
+        "executable": true
+      },
+      {
+        "from": "tools/pm/src/board.mjs",
+        "to": "~/.claude/tools/pm/src/board.mjs"
+      },
+      {
+        "from": "tools/pm/src/brief.mjs",
+        "to": "~/.claude/tools/pm/src/brief.mjs"
+      },
+      {
+        "from": "tools/pm/src/cli.mjs",
+        "to": "~/.claude/tools/pm/src/cli.mjs"
+      },
+      {
+        "from": "tools/pm/src/fence.mjs",
+        "to": "~/.claude/tools/pm/src/fence.mjs"
+      },
+      {
+        "from": "tools/pm/src/journal.mjs",
+        "to": "~/.claude/tools/pm/src/journal.mjs"
+      },
+      {
+        "from": "tools/pm/src/portfolio.mjs",
+        "to": "~/.claude/tools/pm/src/portfolio.mjs"
+      },
+      {
+        "from": "tools/pm/src/tracks.mjs",
+        "to": "~/.claude/tools/pm/src/tracks.mjs"
+      },
+      {
+        "from": "tools/pm/templates/track.md",
+        "to": "~/.claude/tools/pm/templates/track.md"
+      },
+      {
+        "from": "config/portfolio.json",
+        "to": "~/.claude/config/portfolio.json"
+      }
+    ],
+    "schemas": [
+      {
+        "from": "schemas/002-subagent-runs.sql",
+        "apply_to_supabase": true
+      },
+      {
+        "from": "schemas/003-model-audits.sql",
+        "apply_to_supabase": true
+      }
+    ]
+  },
+  "requirements": [
+    {
+      "type": "supabase_project",
+      "name": "<your-supabase-ref>"
+    }
+  ],
+  "smoke_tests": [
+    "test -f ~/.claude/agents/historian.md",
+    "test -f ~/.claude/agents/librarian.md",
+    "test -f ~/.claude/agents/estimator.md",
+    "test -f ~/.claude/skills/model-audit/SKILL.md",
+    "test -f ~/.claude/skills/agent-performance-review/SKILL.md",
+    "test -f ~/.claude/skills/effort-eval/SKILL.md",
+    "test -f ~/.claude/skills/model-eval/SKILL.md",
+    "test -f ~/.claude/tools/pm/package.json",
+    "test -x ~/.claude/tools/pm/bin.mjs",
+    "test -f ~/.claude/tools/pm/src/board.mjs",
+    "test -f ~/.claude/tools/pm/src/brief.mjs",
+    "test -f ~/.claude/tools/pm/src/cli.mjs",
+    "test -f ~/.claude/tools/pm/src/fence.mjs",
+    "test -f ~/.claude/tools/pm/src/journal.mjs",
+    "test -f ~/.claude/tools/pm/src/portfolio.mjs",
+    "test -f ~/.claude/tools/pm/src/tracks.mjs",
+    "test -f ~/.claude/tools/pm/templates/track.md",
+    "test -f ~/.claude/config/portfolio.json",
+    "node -e \"import('node:sqlite').then(()=>process.exit(0),()=>process.exit(1))\""
+  ],
+  "notes": {
+    "smoke_tests": "Artifact 4's tier-4 manifest included `psql_check_table_exists` smoke tests — that is not a real shell command and verify.sh runs smoke tests via eval, so it would fail. Dropped here; Supabase table creation is verified separately via the Supabase MCP at install time (see Tier 4 install log).",
+    "schema_location": "002/003 create tables in the `stack` schema (stack.subagent_runs, stack.model_audits) for consistency with 001-cost-log.sql — Artifact 4 used bare public-schema names.",
+    "pm_layer": "P1a Task 9 (REQ-116, REQ-100). tools/pm/ mirrors the tools/value-check/ and tools/user-docs/ precedent (tier-3): copy-only, each src/*.mjs file listed individually (tier-installer.sh has no recursive-directory copy), test/ intentionally NOT manifested (repo-only, same reasoning as tools/value-check/fixtures/**). tools/pm/bin.mjs is executable (shebang `#!/usr/bin/env node`), same as tools/value-check/src/score.mjs. tools/pm/templates/track.md installs alongside the tool at ~/.claude/tools/pm/templates/track.md (not top-level ~/.claude/templates/) — the plan doc's 'templates/track.md' referred to this file before Task 3 landed it under tools/pm/templates/ instead of repo-root templates/; top-level templates/ is already fully installed at tier-0 and needs no new entries here. config/portfolio.json installs to ~/.claude/config/portfolio.json (plain copy, no merge — same treatment as config/domain-modes.json at tier-3): tools/pm/src/cli.mjs's DEFAULT_CONFIG_PATH is `join(__dirname, '..', '..', '..', 'config', 'portfolio.json')`, which resolves from the installed ~/.claude/tools/pm/src/ to exactly this path. The `node -e \"import('node:sqlite')...\"` smoke test enforces the Node >=22.5 floor tools/pm/package.json declares (node:sqlite is the journal's only dependency, per ADR-059) — it is a hard smoke test, not advisory, because the PM layer is unusable without it and Tier 4 is opt-in (a machine choosing Tier 4 is choosing the PM layer)."
+  },
+  "post_install_note": "Tier 4 skills (model-audit, agent-performance-review) need ~30 days of cost_log and subagent_runs data to produce meaningful output. Set a calendar reminder for first run."
+}

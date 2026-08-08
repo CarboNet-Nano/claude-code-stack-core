@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/permissions-baseline-schema.json",
+  "title": "Permissions Baseline",
+  "description": "ADR-044 Contract A. The single source of truth read by scripts/permissions-compile.sh. No LLM authors a rule — every emitted permissions.deny/ask string derives from this file. Structural validation mirrored (hand-rolled, stdlib-only — no jsonschema dependency in this repo) inside scripts/permissions-compile.sh's embedded validator; this file documents the same shape and is the reviewable spec.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "floor"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "file_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "path_rules expand across these tools (e.g. Edit, Write)."
+    },
+    "floor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "deny": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ruleEntry" }
+        },
+        "path_rules": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/pathRuleEntry" }
+        }
+      }
+    },
+    "domain_overlays": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/overlay" }
+    },
+    "sensitivity_overlays": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deny": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/ruleEntry" }
+          },
+          "mcp_server_denies": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "approval_gate_map": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "mcp_tool_denies": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "bash_guardrails": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "description": "No mcp_server_denies key at this level — approval gates only ever gate specific tools, never a whole server."
+    },
+    "retired_rules": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "The user-scope ownership ledger (D8) — install/update runs --prune-user, which removes exactly these strings from ~/.claude/settings.json."
+    }
+  },
+  "definitions": {
+    "ruleEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "class", "why"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "not": { "pattern": "mcp__[^_]*__\\*" },
+          "description": "A bare rule string. No wildcard MCP specifier (mcp__<server>__* is not supported by the harness)."
+        },
+        "class": {
+          "type": "string",
+          "enum": ["identity", "path", "bash"],
+          "description": "ADR-044 D1 honesty class. identity/path are boundaries; bash is never enforcement."
+        },
+        "why": { "type": "string" }
+      }
+    },
+    "pathRuleEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "class", "why"],
+      "properties": {
+        "path": { "type": "string" },
+        "class": {
+          "type": "string",
+          "enum": ["identity", "path", "bash"]
+        },
+        "why": { "type": "string" }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mcp_tool_denies": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "mcp_server_denies": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "bash_guardrails": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

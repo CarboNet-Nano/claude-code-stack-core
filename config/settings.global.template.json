@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "fileCheckpointingEnabled": true,
+  "autoCompactEnabled": true,
+  "remoteControlAtStartup": true,
+  "fallbackModel": ["claude-sonnet-5", "claude-sonnet-4-6", "claude-haiku-4-5-20251001"],
+  "availableModels": [
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-6",
+    "claude-sonnet-5",
+    "claude-opus-5",
+    "claude-fable-5"
+  ],
+  "enforceAvailableModels": true,
+  "attribution": {
+    "sessionUrl": true
+  },
+  "agentPushNotifEnabled": false,
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "additionalDirectories": [],
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/credentials)",
+      "Edit(./.claude/permissions.stack.json)",
+      "Edit(~/.claude/settings.json)",
+      "Edit(~/.claude/config/permissions-baseline.json)",
+      "Edit(~/.claude/usage-check/**)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/hooks/statusline.sh"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-prefs-init.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-start-handoff.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/brevity-reinforce.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-start-token-check.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/brevity-drift.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/simple-talk.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/bulk-job-reminder.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/post-tool-tsc.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

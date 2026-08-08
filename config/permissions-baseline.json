@@ -1,0 +1,56 @@
+{
+  "$schema": "../schemas/permissions-baseline-schema.json",
+  "version": "1.4.0",
+  "file_tools": ["Edit", "Write"],
+  "floor": {
+    "deny": [
+      { "rule": "Read(~/.ssh/**)", "class": "path", "why": "out-of-repo credentials" },
+      { "rule": "Read(~/.aws/credentials)", "class": "path", "why": "out-of-repo credentials" }
+    ],
+    "path_rules": [
+      { "path": "./.claude/permissions.stack.json", "class": "path", "why": "self-protection: the rule ledger" },
+      { "path": "~/.claude/settings.json", "class": "path", "why": "self-protection: user-scope rules" },
+      { "path": "~/.claude/config/permissions-baseline.json", "class": "path", "why": "self-protection: the compiler's own source of truth -- otherwise an agent can Edit retired_rules to strip the credential-protection floor, then --prune-user makes it permanent" },
+      { "path": "./docs/user/.meta/**", "class": "path", "why": "self-protection: gate-owned receipts; a producer that can Edit its own verdict defeats the parity gate (ADR-050 D3)" },
+      { "path": "./docs/value/.meta/**", "class": "path", "why": "self-protection: gate-owned value-check ledger; a producer that can Edit its own verdict defeats the deterministic scorer (business-value-real-build-v2 D9 Layer 3, mirrors the ./docs/user/.meta/** precedent above)" }
+    ]
+  },
+  "domain_overlays": {
+    "schema-migration": {
+      "mcp_tool_denies": ["apply_migration", "execute_sql", "deploy_edge_function"],
+      "bash_guardrails": ["supabase db push", "supabase migration up", "psql"]
+    },
+    "deploy": {
+      "mcp_tool_denies": ["deploy_edge_function"],
+      "bash_guardrails": ["vercel --prod", "netlify deploy", "supabase functions deploy"]
+    },
+    "financial-code": {
+      "mcp_server_denies": ["stripe"],
+      "bash_guardrails": ["stripe"]
+    },
+    "data-operation": { "bash_guardrails": ["psql"] },
+    "ui-design": {}
+  },
+  "sensitivity_overlays": {
+    "normal": {},
+    "sensitive": {},
+    "confidential": {
+      "deny": [
+        { "rule": "WebFetch", "class": "identity", "why": "exfiltration surface" },
+        { "rule": "WebSearch", "class": "identity", "why": "exfiltration surface" }
+      ],
+      "mcp_server_denies": ["tavily", "exa"]
+    }
+  },
+  "approval_gate_map": {
+    "pre-schema-change": { "mcp_tool_denies": ["apply_migration", "execute_sql"] },
+    "pre-deploy": { "mcp_tool_denies": ["deploy_edge_function"] },
+    "pre-merge": { "bash_guardrails": ["gh pr merge"] },
+    "pre-bulk-job": {},
+    "provisioning": {
+      "bash_guardrails": ["gh repo delete", "gh repo edit", "neonctl", "wrangler"],
+      "mcp_tool_denies": ["delete_project", "delete_branch", "reset_from_parent", "d1_database_delete", "kv_namespace_delete", "r2_bucket_delete", "hyperdrive_config_delete"]
+    }
+  },
+  "retired_rules": []
+}

@@ -1,0 +1,110 @@
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-stop.sh" } ] }
+    ],
+    "PreCompact": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-compact-snapshot.sh" } ] }
+    ],
+    "PostCompact": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-compact-verify.sh" } ] }
+    ],
+    "StopFailure": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/stop-failure-log.sh" } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-end-handoff-reminder.sh" } ] }
+    ],
+    "PermissionDenied": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/permission-denied-log.sh" } ] }
+    ],
+    "ConfigChange": [
+      { "hooks": [ { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/config-change-flag.sh" } ] }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-prefs-init.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-handoff.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/brevity-reinforce.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-token-check.sh" }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/brevity-drift.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/dispatch-nudge.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-shape-nudge.sh" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bulk-job-reminder.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/irreversible-deny.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-cost-monitor.sh" }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/subagent-log.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-cost-monitor.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bare-agent-nudge.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/usage-check-gate.sh" }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/usage-check-gate.sh" }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/workflow-roster-check.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-cost-monitor.sh" }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/design-gate.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/migration-guard.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/usage-check-token.sh" }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-tool-tsc.sh" },
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-check.sh" }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/subagent-complete-log.sh" }
+        ]
+      },
+      {
+        "matcher": "Agent|Workflow",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/loop-cost-accrual.sh" }
+        ]
+      }
+    ]
+  }
+}

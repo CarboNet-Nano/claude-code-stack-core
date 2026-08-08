@@ -1,0 +1,53 @@
+{
+  "$schema": "../schemas/domain-modes-schema.json",
+  "version": "1.1.0",
+  "description": "Domain-specific routing rules. Activated via stack-config.json domain_mode field per project. ADR-053: domain_mode may be a bare string (unchanged) or an array of multiple simultaneously active modes, each scoped to touched paths via domain_mode_paths.",
+  "stage_order": [
+    "product-critic", "architect", "architecture-critic", "designer",
+    "data-engineer", "implementer", "tester", "documenter", "validator",
+    "accessibility-auditor", "security-auditor", "reviewer", "red-team",
+    "ops", "scribe"
+  ],
+  "modes": {
+    "financial-code": {
+      "description": "Code that handles money, AR, AP, revenue, cost. Higher review bar.",
+      "required_subagents_for_change": ["architect", "implementer", "validator", "tester", "red-team", "security-auditor", "reviewer"],
+      "validator_must_cross_check": true,
+      "approval_gates": ["after_architect", "after_validator", "before_merge"],
+      "rationale": "Financial bugs are user-visible and compounding. Apr 2026: 32%/38% AR/AP understatements missed by shape-only validation. Cross-check is mandatory.",
+      "suggested_paths": []
+    },
+    "schema-migration": {
+      "description": "Database schema changes. One-way doors require maximum care.",
+      "required_subagents_for_change": ["architect", "data-engineer", "reviewer", "ops"],
+      "require_adr": true,
+      "require_rollback_plan": true,
+      "approval_gates": ["after_architect", "after_data_engineer", "before_apply"],
+      "rationale": "Migrations cascade across repos. Coordination + rollback are mandatory.",
+      "suggested_paths": ["supabase/migrations/**", "db/migrations/**", "migrations/**", "**/*.sql"]
+    },
+    "deploy": {
+      "description": "Code being deployed to production (edge functions, services).",
+      "required_subagents_for_change": ["implementer", "reviewer", "ops"],
+      "required_skills": ["/deploy-edge"],
+      "approval_gates": ["before_deploy", "after_deploy_verify"],
+      "rationale": "Apr 2026: shipped v51 when v52 was on a worktree branch. Branch + version verification mandatory.",
+      "suggested_paths": ["supabase/functions/**", ".github/workflows/**", "wrangler.toml", "vercel.json"]
+    },
+    "ui-design": {
+      "description": "Visual / dashboard / component work.",
+      "required_subagents_for_change": ["designer", "implementer", "accessibility-auditor", "reviewer"],
+      "required_skills": ["/design-match"],
+      "approval_gates": ["after_designer_inventory", "before_merge"],
+      "rationale": "Apr 2026: 12 ui_design_matching sessions, 21-commit screenshot loops. Inventory before build, diff before merge.",
+      "suggested_paths": ["src/components/**", "src/pages/**", "app/**", "components/**"]
+    },
+    "data-operation": {
+      "description": "Bulk data operations — enrichment, backfill, migration of data values.",
+      "required_skills": ["/cost-gate", "/coverage-snapshot"],
+      "required_subagents_for_change": ["architect", "implementer", "validator"],
+      "rationale": "Apr 2026: re-enrichment script dropped coverage 90%→34%. Coverage gate mandatory.",
+      "suggested_paths": []
+    }
+  }
+}

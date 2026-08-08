@@ -1,0 +1,90 @@
+# Global Claude Code Standards (USER-LEVEL)
+
+> Canonical template for `~/.claude/CLAUDE.md`. This is user-level (cross-project) standards. Per-project nuance goes in each repo's `CLAUDE.md` via `PROJECT-CLAUDE.md.template`.
+
+## Core Principles (Always Active)
+
+| Principle | Rule |
+|-----------|------|
+| **SRP** | Single Responsibility — each function/class does ONE thing |
+| **DRY** | Don't Repeat Yourself — extract duplicates, reuse |
+| **KISS** | Keep It Simple — simplest solution that works |
+| **YAGNI** | You Aren't Gonna Need It — don't build unused features |
+
+## Working Principles
+
+1. **Don't assume. Don't hide confusion. Surface tradeoffs.** If unsure what the user wants, ask. If two reasonable approaches exist, name both with their tradeoffs before picking one.
+2. **Minimum code that solves the problem. Nothing speculative.** No "while I'm here" refactors, no helpers for hypothetical second callers.
+3. **Touch only what you must. Clean up only your own mess.** Don't reformat unrelated lines, don't rename unrelated variables.
+4. **Define success criteria. Loop until verified.** Before starting, state what "done" looks like in observable terms. Don't claim done until checked against that criterion.
+
+## Response Style — HARD RULES
+
+- **Default length: <100 tokens.** User asks for detail if they want it.
+- **NO preamble.** Don't say "Let me…", "I'll…", "Sure…", "Of course…".
+- **NO recap** of the user's message back to them.
+- **NO trailing summary** of what was just done, unless asked.
+- **One-screen max.** If it won't fit, write to `/tmp/` or `.claude/scratch/` and reply with path + 2-line summary.
+- **Caveman tone is the default voice.** See `/caveman` skill. Drop articles, fragments OK, short synonyms.
+- **Code/commits/PRs:** write normally (full sentences).
+- **Safety-critical messages** (security warnings, irreversible actions, multi-step sequences): full sentences for clarity.
+
+## Clarifying-Question Format
+
+When asking a clarifying question, use a-b-c multiple choice:
+
+> Question?
+> a) Option A — one-line tradeoff
+> b) Option B — one-line tradeoff
+> c) Option C — one-line tradeoff (only if a real third exists)
+
+User answers with a single letter. Don't pad with "d) something else?".
+
+## Plan Before Code (non-trivial changes)
+
+Before writing code on any non-trivial task, post a 5-line plan:
+1. What I think is broken (or what we're building)
+2. Top 2–3 approaches/causes, ranked
+3. Evidence that distinguishes them
+4. Cheapest test for #3
+5. Rollback if wrong
+
+Wait for confirmation. Skip only for: typo fixes, single-line changes, obvious renames.
+
+## Coding Style
+
+- Write code directly — no tutorials, no narration
+- Let code self-document; name things clearly
+- Fix bugs immediately, don't explain first
+- Inline small things; no unnecessary abstractions
+- Functions ≤20 lines (ideal 5–10), ≤3 args
+- Guard clauses + early returns; max 2 levels of nesting
+- No side effects on inputs
+
+## Comments
+
+Default: write **no comments**. Only when WHY is non-obvious — a hidden constraint, a subtle invariant, a workaround for a specific bug.
+
+## Auto Mode Scope
+
+Auto mode = make reasonable assumptions on systems you control (files you're writing, deps you install). Auto mode does NOT cover:
+
+- **Existing user files / paths** — check or ask.
+- **External services / setup** — check or ask.
+- **User intent with 2+ reasonable interpretations** — ask MCQ.
+- **Architecture decisions with 2+ reasonable interpretations** — ask MCQ.
+- **Project conventions you haven't seen** — grep or ask.
+
+## Stack Awareness
+
+In projects with `.claude/stack-config.json`:
+- `foreman` orchestrates multi-step work
+- Skills: `/handoff`, `/goodmorning`, `/plan`, `/cost-gate`, `/project-init`, `/budget-guard`
+- Run `/goodmorning` at session start
+- Run `/handoff` before ending a session with open work
+
+In projects without `.claude/stack-config.json`: foreman refuses to dispatch. Run `/project-init` first.
+
+## Session Start — Echo the Banner
+
+The stack's SessionStart hook injects one of three blocks. The user does NOT see hook output in their UI — only the agent does. Echo the banner verbatim as the first thing in the first response of the session.

@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+# git_loss_audit.sh — report what local Git work is at risk of loss. NON-DESTRUCTIVE.
+#
+# Answers the authoritative "would I actually lose anything?" questions across EVERY local place
+# work hides — not just branches:
+#   1. LOCAL-ONLY commits — reachable from the current HEAD, any linked-worktree HEAD, a local
+#      branch, or a tag, but on NO remote. Enumerating every worktree HEAD catches detached commits
+#      in another checkout that `git log HEAD --branches --tags` misses.
+#   2. WORKTREES — every checkout is inspected for tracked and untracked changes. A clean branch
+#      does not make a dirty linked worktree safe to remove.
+#   3. STASHES — `git stash` entries are local-only by nature and a classic loss vector.
+#   4. DANGLING commits — orphaned objects (dropped stashes, rebase leftovers, abandoned resets).
+#      Reflog-reachable now, but eligible for `git gc` later. (git fsck --dangling)
+#
+# It refreshes remote-tracking refs with `fetch`, then only inspects repository/worktree state. It
+# never changes working files, commits, branches, stashes, or user-authored refs.
+#
+# Usage (run from anywhere inside the repo):
+#   git_loss_audit.sh [remote]        # remote defaults to "origin"
+#
+# Exit code: 0 if nothing is at surprising risk, 1 if LOCAL-ONLY commits or dirty/inaccessible
+# worktrees exist, 2 if not run inside a Git repository. Stashes and dangling commits are reported
+# but stay exit 0 (known/recoverable, not a surprise).
+set -euo pipefail
+
+REMOTE="${1:-origin}"
+
+# Must be inside a work tree; fail clearly rather than emitting confusing git errors.
+if ! git rev-parse --show-toplevel >/dev/null 2>&1; then
+  echo "ERROR: not inside a Git repository." >&2
+  exit 2
+fi
+cd "$(git rev-parse --show-toplevel)"
+
+# Refresh remote-tracking refs so the local-only check is accurate. Best-effort: if the remote is
+# unreachable (offline / proxy), keep going with cached refs rather than aborting.
+if git remote get-url "$REMOTE" >/dev/null 2>&1; then
+  if ! git fetch "$REMOTE" --prune --quiet 2>/dev/null; then
+    echo "note: could not fetch '$REMOTE' (offline?); auditing against cached remote refs." >&2
+  fi
+else
+  echo "note: no remote named '$REMOTE'; every local commit will count as local-only." >&2
+fi
+# If more than one remote exists, remote-tracking refs of the OTHER remotes also suppress the
+# local-only check; a stale tracking ref there could mask real loss. Flag it rather than hide it.
+REMOTE_COUNT="$(git remote | grep -c . || true)"
+if [ "$REMOTE_COUNT" -gt 1 ]; then
+  echo "note: $REMOTE_COUNT remotes configured; only '$REMOTE' was refreshed. Stale tracking refs" >&2
+  echo "      on the others could hide local-only work — 'git fetch --all --prune' to be sure." >&2
+fi
+
+echo "=== Local-only commits (reachable from HEAD / a local branch / a tag, on NO remote) ==="
+# Include every linked-worktree HEAD explicitly. --branches covers branch-backed worktrees, but a
+# detached HEAD in another worktree otherwise belongs to no branch and is invisible from here.
+WORKTREE_HEADS=()
+while IFS= read -r worktree_head; do
+  [ -n "$worktree_head" ] && WORKTREE_HEADS+=("$worktree_head")
+done < <(git worktree list --porcelain | sed -n 's/^HEAD //p')
+LOCAL_ONLY="$(git log HEAD --branches --tags "${WORKTREE_HEADS[@]}" --not --remotes --oneline --decorate 2>/dev/null || true)"
+if [ -n "$LOCAL_ONLY" ]; then
+  echo "$LOCAL_ONLY" | sed 's/^/  /'
+else
+  echo "  (none)"
+fi
+LOCAL_ONLY_COUNT="$(printf '%s' "$LOCAL_ONLY" | grep -c . || true)"
+
+echo ""
+echo "=== Worktrees (each checkout can hide uncommitted or detached work) ==="
+PRIMARY_WORKTREE="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
+WORKTREE_COUNT=0
+DIRTY_WORKTREE_COUNT=0
+UNAVAILABLE_WORKTREE_COUNT=0
+while IFS= read -r worktree_path; do
+  [ -z "$worktree_path" ] && continue
+  WORKTREE_COUNT=$((WORKTREE_COUNT + 1))
+  worktree_role="linked"
+  [ "$worktree_path" = "$PRIMARY_WORKTREE" ] && worktree_role="primary"
+
+  if [ ! -d "$worktree_path" ]; then
+    printf '  %s  (%s, unavailable/prunable)\n' "$worktree_path" "$worktree_role"
+    UNAVAILABLE_WORKTREE_COUNT=$((UNAVAILABLE_WORKTREE_COUNT + 1))
+    continue
+  fi
+
+  if ! worktree_head="$(git -C "$worktree_path" rev-parse --short HEAD 2>/dev/null)"; then
+    printf '  %s  (%s, unreadable Git state)\n' "$worktree_path" "$worktree_role"
+    UNAVAILABLE_WORKTREE_COUNT=$((UNAVAILABLE_WORKTREE_COUNT + 1))
+    continue
+  fi
+  worktree_branch="$(git -C "$worktree_path" symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+  [ -z "$worktree_branch" ] && worktree_branch="detached"
+  if ! worktree_status="$(git -C "$worktree_path" status --porcelain --untracked-files=all 2>/dev/null)"; then
+    printf '  %s  (%s, %s@%s, status unavailable)\n' \
+      "$worktree_path" "$worktree_role" "$worktree_branch" "$worktree_head"
+    UNAVAILABLE_WORKTREE_COUNT=$((UNAVAILABLE_WORKTREE_COUNT + 1))
+    continue
+  fi
+  worktree_dirty_count="$(printf '%s' "$worktree_status" | grep -c . || true)"
+  if [ "$worktree_dirty_count" -gt 0 ]; then
+    printf '  %s  (%s, %s@%s, DIRTY: %s path(s))\n' \
+      "$worktree_path" "$worktree_role" "$worktree_branch" "$worktree_head" "$worktree_dirty_count"
+    DIRTY_WORKTREE_COUNT=$((DIRTY_WORKTREE_COUNT + 1))
+  else
+    printf '  %s  (%s, %s@%s, clean)\n' \
+      "$worktree_path" "$worktree_role" "$worktree_branch" "$worktree_head"
+  fi
+done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
+
+echo ""
+echo "=== Stashes (local-only by nature — a dead disk loses these too) ==="
+STASHES="$(git stash list 2>/dev/null || true)"
+STASH_COUNT="$(printf '%s' "$STASHES" | grep -c . || true)"
+if [ "$STASH_COUNT" -gt 0 ]; then
+  printf '%s\n' "$STASHES" | sed 's/^/  /'
+else
+  echo "  (none)"
+fi
+
+echo ""
+echo "=== Dangling commits (orphaned; reflog-reachable now, gc-eligible later) ==="
+DANGLING="$(git fsck --dangling 2>/dev/null | awk '/dangling commit/ {print $3}' || true)"
+DANGLING_COUNT="$(printf '%s' "$DANGLING" | grep -c . || true)"
+if [ "$DANGLING_COUNT" -gt 0 ]; then
+  printf '%s\n' "$DANGLING" | head -20 | while read -r sha; do
+    [ -n "$sha" ] && printf '  %s %s\n' "$(git log -1 --format='%h' "$sha" 2>/dev/null)" \
+      "$(git log -1 --format='%s' "$sha" 2>/dev/null | cut -c1-64)"
+  done
+  [ "$DANGLING_COUNT" -gt 20 ] && echo "  ... and $((DANGLING_COUNT - 20)) more"
+else
+  echo "  (none)"
+fi
+
+echo ""
+echo "=== Verdict ==="
+echo "  local-only: ${LOCAL_ONLY_COUNT}   worktrees: ${WORKTREE_COUNT} (${DIRTY_WORKTREE_COUNT} dirty, ${UNAVAILABLE_WORKTREE_COUNT} unavailable)"
+echo "  stashes: ${STASH_COUNT}   dangling: ${DANGLING_COUNT}"
+if [ "$LOCAL_ONLY_COUNT" -gt 0 ]; then
+  echo "  ⚠ ${LOCAL_ONLY_COUNT} commit(s) exist ONLY locally (no remote has them). Back each up with the"
+  echo "    triple-backup — a local branch is not enough, since gc/disk loss can still take it:"
+  echo "      git branch backup/<name> <sha> && git push origin backup/<name> && git format-patch -1 <sha> --stdout > <name>.patch"
+  echo "    (git_preserve_danglers.sh only covers DANGLING commits, not these branch-reachable ones.)"
+fi
+if [ "$DIRTY_WORKTREE_COUNT" -gt 0 ]; then
+  echo "  ⚠ ${DIRTY_WORKTREE_COUNT} worktree(s) contain uncommitted tracked or untracked files."
+  echo "    Commit/preserve them before removing any worktree; never use 'git worktree remove --force'."
+fi
+if [ "$UNAVAILABLE_WORKTREE_COUNT" -gt 0 ]; then
+  echo "  ⚠ ${UNAVAILABLE_WORKTREE_COUNT} registered worktree(s) could not be inspected. Resolve or"
+  echo "    prove them prunable before cleanup; an unreadable checkout is not evidence of no work."
+fi
+if [ "$STASH_COUNT" -gt 0 ]; then
+  echo "  • ${STASH_COUNT} stash(es) are local-only; if any is precious, turn it into a commit + push it."
+fi
+if [ "$DANGLING_COUNT" -gt 0 ]; then
+  echo "  • ${DANGLING_COUNT} dangling commit(s) are recoverable now but gc-eligible later — pin past the"
+  echo "    gc window with: git_preserve_danglers.sh"
+fi
+if [ "$LOCAL_ONLY_COUNT" -eq 0 ] && [ "$DIRTY_WORKTREE_COUNT" -eq 0 ] && \
+   [ "$UNAVAILABLE_WORKTREE_COUNT" -eq 0 ] && [ "$STASH_COUNT" -eq 0 ] && \
+   [ "$DANGLING_COUNT" -eq 0 ]; then
+  echo "  ✓ Zero loss risk — every worktree is clean and every local commit is on a remote;"
+  echo "    no stashes or orphaned objects remain."
+fi
+
+# Exit 1 for surprising, actionable state. Stashes/dangling stay exit 0 so a routine stash does
+# not cry wolf, but a dirty or unreadable worktree must block claims that cleanup is safe.
+if [ "$LOCAL_ONLY_COUNT" -gt 0 ] || [ "$DIRTY_WORKTREE_COUNT" -gt 0 ] || \
+   [ "$UNAVAILABLE_WORKTREE_COUNT" -gt 0 ]; then
+  exit 1
+fi
+exit 0

@@ -1,0 +1,12 @@
+{
+  "portfolios": {
+    "carbonet": {
+      "pace": "balanced",
+      "members": [
+        "CarboNet-Nano/carbonet-provisioner",
+        "CarboNet-Nano/carbonet-app-template",
+        "get-lade/claude-code-stack"
+      ]
+    }
+  }
+}
