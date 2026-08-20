@@ -1,0 +1,8 @@
+# Handbook coverage map — explicit tool→page bindings for systems whose
+# machinery page is not named exactly after the tool. One entry per line:
+# <tools-path>  <machinery page filename>
+# The coverage gate refuses a mapping whose page file does not exist, so a
+# renamed page turns this red instead of silently uncovering the tool.
+tools/pm  pm-journal.md
+tools/user-docs  user-docs-pipeline.md
+tools/handbook  handbook-generator.md

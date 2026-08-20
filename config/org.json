@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "org": {
+    "id": "carbonet",
+    "display_name": "CarboNet",
+    "access_url": "https://access.carbonet.app",
+    "support_contact": "ask Bill in #eng-help",
+    "required_providers": ["anthropic", "openai", "gemini"]
+  }
+}

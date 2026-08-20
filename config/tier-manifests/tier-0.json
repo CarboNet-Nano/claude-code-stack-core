@@ -1,0 +1,883 @@
+{
+  "tier": 0,
+  "name": "Foundation",
+  "description": "Friction-killer hooks and handoff skills. No external API costs beyond Claude.",
+  "files": {
+    "global": [
+      {
+        "from": "config/claude.md.global.template",
+        "to": "~/.claude/CLAUDE.md",
+        "merge": true
+      },
+      {
+        "from": "config/settings.global.template.json",
+        "to": "~/.claude/settings.json",
+        "merge": true
+      },
+      {
+        "from": "hooks/session-prefs-init.sh",
+        "to": "~/.claude/hooks/session-prefs-init.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/session-start-handoff.sh",
+        "to": "~/.claude/hooks/session-start-handoff.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/session-marker.sh",
+        "to": "~/.claude/hooks/session-marker.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/session-scope.sh",
+        "to": "~/.claude/lib/session-scope.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/portable-core-refresh.sh",
+        "to": "~/.claude/hooks/portable-core-refresh.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/portable-core.sh",
+        "to": "~/.claude/lib/portable-core.sh",
+        "executable": true
+      },
+      {
+        "from": "scripts/session-close.sh",
+        "to": "~/.claude/scripts/session-close.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/carbonight/SKILL.md",
+        "to": "~/.claude/skills/carbonight/SKILL.md"
+      },
+      {
+        "from": "lib/plain-text-guard.sh",
+        "to": "~/.claude/lib/plain-text-guard.sh",
+        "executable": true
+      },
+      {
+        "from": "scripts/session-brief.sh",
+        "to": "~/.claude/scripts/session-brief.sh",
+        "executable": true
+      },
+      {
+        "from": "scripts/improvement-queue.sh",
+        "to": "~/.claude/scripts/improvement-queue.sh",
+        "executable": true
+      },
+      {
+        "from": "scripts/overnight-guard.sh",
+        "to": "~/.claude/scripts/overnight-guard.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/sandbox-policy-session-start.sh",
+        "to": "~/.claude/hooks/sandbox-policy-session-start.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/sandbox-policy-recompile.sh",
+        "to": "~/.claude/hooks/sandbox-policy-recompile.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/vendor-egress-cloud-guard.sh",
+        "to": "~/.claude/hooks/vendor-egress-cloud-guard.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/brevity-reinforce.sh",
+        "to": "~/.claude/hooks/brevity-reinforce.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/brevity-drift.sh",
+        "to": "~/.claude/hooks/brevity-drift.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/simple-talk.sh",
+        "to": "~/.claude/hooks/simple-talk.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/post-tool-tsc.sh",
+        "to": "~/.claude/hooks/post-tool-tsc.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/bulk-job-reminder.sh",
+        "to": "~/.claude/hooks/bulk-job-reminder.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/statusline.sh",
+        "to": "~/.claude/hooks/statusline.sh",
+        "executable": true
+      },
+      {
+        "from": "hooks/session-start-token-check.sh",
+        "to": "~/.claude/hooks/session-start-token-check.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/find-stack-config.sh",
+        "to": "~/.claude/lib/find-stack-config.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/domain-modes.sh",
+        "to": "~/.claude/lib/domain-modes.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/stack-freshness.sh",
+        "to": "~/.claude/lib/stack-freshness.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/profile-resolver.sh",
+        "to": "~/.claude/lib/profile-resolver.sh",
+        "executable": true
+      },
+      {
+        "from": "scripts/check-token-expiry.sh",
+        "to": "~/.claude/scripts/check-token-expiry.sh",
+        "executable": true
+      },
+      {
+        "from": "scripts/cloud-bootstrap.sh",
+        "to": "~/.claude/scripts/cloud-bootstrap.sh",
+        "executable": true
+      },
+      {
+        "from": "config/portable-core-skills.json",
+        "to": "~/.claude/config/portable-core-skills.json"
+      },
+      {
+        "from": "config/portable-core-manifest.json",
+        "to": "~/.claude/config/portable-core-manifest.json"
+      },
+      {
+        "from": "templates/project-cloud-settings.template.json",
+        "to": "~/.claude/templates/project-cloud-settings.template.json"
+      },
+      {
+        "from": "skills/handoff/SKILL.md",
+        "to": "~/.claude/skills/handoff/SKILL.md"
+      },
+      {
+        "from": "skills/goodmorning/SKILL.md",
+        "to": "~/.claude/skills/goodmorning/SKILL.md"
+      },
+      {
+        "from": "skills/todo/SKILL.md",
+        "to": "~/.claude/skills/todo/SKILL.md"
+      },
+      {
+        "from": "skills/adhd/SKILL.md",
+        "to": "~/.claude/skills/adhd/SKILL.md"
+      },
+      {
+        "from": "skills/grilling/SKILL.md",
+        "to": "~/.claude/skills/grilling/SKILL.md"
+      },
+      {
+        "from": "skills/grill-me/SKILL.md",
+        "to": "~/.claude/skills/grill-me/SKILL.md"
+      },
+      {
+        "from": "skills/operating/SKILL.md",
+        "to": "~/.claude/skills/operating/SKILL.md"
+      },
+      {
+        "from": "skills/env-doctor/SKILL.md",
+        "to": "~/.claude/skills/env-doctor/SKILL.md"
+      },
+      {
+        "from": "skills/team-init/SKILL.md",
+        "to": "~/.claude/skills/team-init/SKILL.md"
+      },
+      {
+        "from": "templates/team-admin/README.md",
+        "to": "~/.claude/templates/team-admin/README.md"
+      },
+      {
+        "from": "templates/team-admin/config.yml",
+        "to": "~/.claude/templates/team-admin/config.yml"
+      },
+      {
+        "from": "templates/team-admin/.github/workflows/reconcile.yml",
+        "to": "~/.claude/templates/team-admin/.github/workflows/reconcile.yml"
+      },
+      {
+        "from": "templates/team-admin/scripts/reconcile.sh",
+        "to": "~/.claude/templates/team-admin/scripts/reconcile.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/cloud-setup/SKILL.md",
+        "to": "~/.claude/skills/cloud-setup/SKILL.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/SKILL.md",
+        "to": "~/.claude/skills/claude-automation-recommender/SKILL.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/LICENSE",
+        "to": "~/.claude/skills/claude-automation-recommender/LICENSE"
+      },
+      {
+        "from": "skills/claude-automation-recommender/ATTRIBUTION.md",
+        "to": "~/.claude/skills/claude-automation-recommender/ATTRIBUTION.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/references/hooks-patterns.md",
+        "to": "~/.claude/skills/claude-automation-recommender/references/hooks-patterns.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/references/subagent-templates.md",
+        "to": "~/.claude/skills/claude-automation-recommender/references/subagent-templates.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/references/plugins-reference.md",
+        "to": "~/.claude/skills/claude-automation-recommender/references/plugins-reference.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/references/mcp-servers.md",
+        "to": "~/.claude/skills/claude-automation-recommender/references/mcp-servers.md"
+      },
+      {
+        "from": "skills/claude-automation-recommender/references/skills-reference.md",
+        "to": "~/.claude/skills/claude-automation-recommender/references/skills-reference.md"
+      },
+      {
+        "from": "skills/claude-api/ATTRIBUTION.md",
+        "to": "~/.claude/skills/claude-api/ATTRIBUTION.md"
+      },
+      {
+        "from": "skills/claude-api/LICENSE.txt",
+        "to": "~/.claude/skills/claude-api/LICENSE.txt"
+      },
+      {
+        "from": "skills/claude-api/SKILL.md",
+        "to": "~/.claude/skills/claude-api/SKILL.md"
+      },
+      {
+        "from": "skills/claude-api/csharp/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/csharp/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/csharp/claude-api/batches.md",
+        "to": "~/.claude/skills/claude-api/csharp/claude-api/batches.md"
+      },
+      {
+        "from": "skills/claude-api/csharp/claude-api/files-api.md",
+        "to": "~/.claude/skills/claude-api/csharp/claude-api/files-api.md"
+      },
+      {
+        "from": "skills/claude-api/csharp/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/csharp/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/csharp/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/csharp/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/curl/examples.md",
+        "to": "~/.claude/skills/claude-api/curl/examples.md"
+      },
+      {
+        "from": "skills/claude-api/curl/managed-agents.md",
+        "to": "~/.claude/skills/claude-api/curl/managed-agents.md"
+      },
+      {
+        "from": "skills/claude-api/go/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/go/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/go/claude-api/files-api.md",
+        "to": "~/.claude/skills/claude-api/go/claude-api/files-api.md"
+      },
+      {
+        "from": "skills/claude-api/go/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/go/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/go/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/go/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/go/managed-agents/README.md",
+        "to": "~/.claude/skills/claude-api/go/managed-agents/README.md"
+      },
+      {
+        "from": "skills/claude-api/java/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/java/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/java/claude-api/files-api.md",
+        "to": "~/.claude/skills/claude-api/java/claude-api/files-api.md"
+      },
+      {
+        "from": "skills/claude-api/java/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/java/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/java/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/java/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/java/managed-agents/README.md",
+        "to": "~/.claude/skills/claude-api/java/managed-agents/README.md"
+      },
+      {
+        "from": "skills/claude-api/php/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/php/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/php/claude-api/batches.md",
+        "to": "~/.claude/skills/claude-api/php/claude-api/batches.md"
+      },
+      {
+        "from": "skills/claude-api/php/claude-api/files-api.md",
+        "to": "~/.claude/skills/claude-api/php/claude-api/files-api.md"
+      },
+      {
+        "from": "skills/claude-api/php/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/php/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/php/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/php/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/php/managed-agents/README.md",
+        "to": "~/.claude/skills/claude-api/php/managed-agents/README.md"
+      },
+      {
+        "from": "skills/claude-api/python/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/python/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/python/claude-api/batches.md",
+        "to": "~/.claude/skills/claude-api/python/claude-api/batches.md"
+      },
+      {
+        "from": "skills/claude-api/python/claude-api/files-api.md",
+        "to": "~/.claude/skills/claude-api/python/claude-api/files-api.md"
+      },
+      {
+        "from": "skills/claude-api/python/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/python/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/python/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/python/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/python/managed-agents/README.md",
+        "to": "~/.claude/skills/claude-api/python/managed-agents/README.md"
+      },
+      {
+        "from": "skills/claude-api/ruby/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/ruby/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/ruby/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/ruby/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/ruby/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/ruby/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/ruby/managed-agents/README.md",
+        "to": "~/.claude/skills/claude-api/ruby/managed-agents/README.md"
+      },
+      {
+        "from": "skills/claude-api/shared/agent-design.md",
+        "to": "~/.claude/skills/claude-api/shared/agent-design.md"
+      },
+      {
+        "from": "skills/claude-api/shared/anthropic-cli.md",
+        "to": "~/.claude/skills/claude-api/shared/anthropic-cli.md"
+      },
+      {
+        "from": "skills/claude-api/shared/claude-platform-on-aws.md",
+        "to": "~/.claude/skills/claude-api/shared/claude-platform-on-aws.md"
+      },
+      {
+        "from": "skills/claude-api/shared/error-codes.md",
+        "to": "~/.claude/skills/claude-api/shared/error-codes.md"
+      },
+      {
+        "from": "skills/claude-api/shared/live-sources.md",
+        "to": "~/.claude/skills/claude-api/shared/live-sources.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-api-reference.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-api-reference.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-client-patterns.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-client-patterns.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-core.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-core.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-environments.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-environments.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-events.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-events.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-memory.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-memory.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-multiagent.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-multiagent.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-onboarding.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-onboarding.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-outcomes.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-outcomes.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-overview.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-overview.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-scheduled-deployments.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-scheduled-deployments.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-self-hosted-sandboxes.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-self-hosted-sandboxes.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-tools.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-tools.md"
+      },
+      {
+        "from": "skills/claude-api/shared/managed-agents-webhooks.md",
+        "to": "~/.claude/skills/claude-api/shared/managed-agents-webhooks.md"
+      },
+      {
+        "from": "skills/claude-api/shared/model-migration.md",
+        "to": "~/.claude/skills/claude-api/shared/model-migration.md"
+      },
+      {
+        "from": "skills/claude-api/shared/models.md",
+        "to": "~/.claude/skills/claude-api/shared/models.md"
+      },
+      {
+        "from": "skills/claude-api/shared/platform-availability.md",
+        "to": "~/.claude/skills/claude-api/shared/platform-availability.md"
+      },
+      {
+        "from": "skills/claude-api/shared/prompt-caching.md",
+        "to": "~/.claude/skills/claude-api/shared/prompt-caching.md"
+      },
+      {
+        "from": "skills/claude-api/shared/token-counting.md",
+        "to": "~/.claude/skills/claude-api/shared/token-counting.md"
+      },
+      {
+        "from": "skills/claude-api/shared/tool-use-concepts.md",
+        "to": "~/.claude/skills/claude-api/shared/tool-use-concepts.md"
+      },
+      {
+        "from": "skills/claude-api/typescript/claude-api/README.md",
+        "to": "~/.claude/skills/claude-api/typescript/claude-api/README.md"
+      },
+      {
+        "from": "skills/claude-api/typescript/claude-api/batches.md",
+        "to": "~/.claude/skills/claude-api/typescript/claude-api/batches.md"
+      },
+      {
+        "from": "skills/claude-api/typescript/claude-api/files-api.md",
+        "to": "~/.claude/skills/claude-api/typescript/claude-api/files-api.md"
+      },
+      {
+        "from": "skills/claude-api/typescript/claude-api/streaming.md",
+        "to": "~/.claude/skills/claude-api/typescript/claude-api/streaming.md"
+      },
+      {
+        "from": "skills/claude-api/typescript/claude-api/tool-use.md",
+        "to": "~/.claude/skills/claude-api/typescript/claude-api/tool-use.md"
+      },
+      {
+        "from": "skills/claude-api/typescript/managed-agents/README.md",
+        "to": "~/.claude/skills/claude-api/typescript/managed-agents/README.md"
+      },
+      {
+        "from": "schemas/stack-config-schema.json",
+        "to": "~/.claude/schemas/stack-config-schema.json"
+      },
+      {
+        "from": "schemas/stack-defaults-schema.json",
+        "to": "~/.claude/schemas/stack-defaults-schema.json"
+      },
+      {
+        "from": "templates/PROJECT-CLAUDE.md.template",
+        "to": "~/.claude/templates/PROJECT-CLAUDE.md.template"
+      },
+      {
+        "from": "templates/PROJECT-ONBOARDING.md.template",
+        "to": "~/.claude/templates/PROJECT-ONBOARDING.md.template"
+      },
+      {
+        "from": "templates/PROJECT-README.md.template",
+        "to": "~/.claude/templates/PROJECT-README.md.template"
+      },
+      {
+        "from": "templates/ADR.template.md",
+        "to": "~/.claude/templates/ADR.template.md"
+      },
+      {
+        "from": "templates/RUNBOOK.template.md",
+        "to": "~/.claude/templates/RUNBOOK.template.md"
+      },
+      {
+        "from": "skills/git-safety-net/SKILL.md",
+        "to": "~/.claude/skills/git-safety-net/SKILL.md"
+      },
+      {
+        "from": "skills/git-safety-net/LICENSE",
+        "to": "~/.claude/skills/git-safety-net/LICENSE"
+      },
+      {
+        "from": "skills/git-safety-net/ATTRIBUTION.md",
+        "to": "~/.claude/skills/git-safety-net/ATTRIBUTION.md"
+      },
+      {
+        "from": "skills/git-safety-net/agents/openai.yaml",
+        "to": "~/.claude/skills/git-safety-net/agents/openai.yaml"
+      },
+      {
+        "from": "skills/git-safety-net/references/merge_verification.md",
+        "to": "~/.claude/skills/git-safety-net/references/merge_verification.md"
+      },
+      {
+        "from": "skills/git-safety-net/references/prevention_practices.md",
+        "to": "~/.claude/skills/git-safety-net/references/prevention_practices.md"
+      },
+      {
+        "from": "skills/git-safety-net/references/recovery_playbook.md",
+        "to": "~/.claude/skills/git-safety-net/references/recovery_playbook.md"
+      },
+      {
+        "from": "skills/git-safety-net/scripts/git_export_before_drop.sh",
+        "to": "~/.claude/skills/git-safety-net/scripts/git_export_before_drop.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/git-safety-net/scripts/git_find_all_checkouts.sh",
+        "to": "~/.claude/skills/git-safety-net/scripts/git_find_all_checkouts.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/git-safety-net/scripts/git_loss_audit.sh",
+        "to": "~/.claude/skills/git-safety-net/scripts/git_loss_audit.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/git-safety-net/scripts/git_preserve_danglers.sh",
+        "to": "~/.claude/skills/git-safety-net/scripts/git_preserve_danglers.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/git-safety-net/scripts/git_verify_branch_merged.sh",
+        "to": "~/.claude/skills/git-safety-net/scripts/git_verify_branch_merged.sh",
+        "executable": true
+      },
+      {
+        "from": "skills/git-safety-net/tests/test_git_find_all_checkouts.py",
+        "to": "~/.claude/skills/git-safety-net/tests/test_git_find_all_checkouts.py"
+      },
+      {
+        "from": "agents/accessibility-auditor.md",
+        "to": "~/.claude/agents/accessibility-auditor.md"
+      },
+      {
+        "from": "agents/architect.md",
+        "to": "~/.claude/agents/architect.md"
+      },
+      {
+        "from": "agents/architecture-critic.md",
+        "to": "~/.claude/agents/architecture-critic.md"
+      },
+      {
+        "from": "agents/data-engineer.md",
+        "to": "~/.claude/agents/data-engineer.md"
+      },
+      {
+        "from": "agents/designer.md",
+        "to": "~/.claude/agents/designer.md"
+      },
+      {
+        "from": "agents/documenter.md",
+        "to": "~/.claude/agents/documenter.md"
+      },
+      {
+        "from": "agents/estimator.md",
+        "to": "~/.claude/agents/estimator.md"
+      },
+      {
+        "from": "agents/foreman-team-lead.md",
+        "to": "~/.claude/agents/foreman-team-lead.md"
+      },
+      {
+        "from": "agents/historian.md",
+        "to": "~/.claude/agents/historian.md"
+      },
+      {
+        "from": "agents/implementer.md",
+        "to": "~/.claude/agents/implementer.md"
+      },
+      {
+        "from": "agents/incident-commander.md",
+        "to": "~/.claude/agents/incident-commander.md"
+      },
+      {
+        "from": "agents/integration-specialist.md",
+        "to": "~/.claude/agents/integration-specialist.md"
+      },
+      {
+        "from": "agents/librarian.md",
+        "to": "~/.claude/agents/librarian.md"
+      },
+      {
+        "from": "agents/ops.md",
+        "to": "~/.claude/agents/ops.md"
+      },
+      {
+        "from": "agents/performance-engineer.md",
+        "to": "~/.claude/agents/performance-engineer.md"
+      },
+      {
+        "from": "agents/pm.md",
+        "to": "~/.claude/agents/pm.md"
+      },
+      {
+        "from": "agents/product-critic.md",
+        "to": "~/.claude/agents/product-critic.md"
+      },
+      {
+        "from": "agents/red-team.md",
+        "to": "~/.claude/agents/red-team.md"
+      },
+      {
+        "from": "agents/reviewer.md",
+        "to": "~/.claude/agents/reviewer.md"
+      },
+      {
+        "from": "agents/scribe.md",
+        "to": "~/.claude/agents/scribe.md"
+      },
+      {
+        "from": "agents/security-auditor.md",
+        "to": "~/.claude/agents/security-auditor.md"
+      },
+      {
+        "from": "agents/tester.md",
+        "to": "~/.claude/agents/tester.md"
+      },
+      {
+        "from": "agents/user-docs-writer.md",
+        "to": "~/.claude/agents/user-docs-writer.md"
+      },
+      {
+        "from": "agents/validator.md",
+        "to": "~/.claude/agents/validator.md"
+      },
+      {
+        "from": "scripts/org-check.sh",
+        "to": "~/.claude/scripts/org-check.sh",
+        "executable": true
+      },
+      {
+        "from": "lib/stack-config-validate.sh",
+        "to": "~/.claude/lib/stack-config-validate.sh",
+        "executable": true
+      },
+      {
+        "from": "config/org.json",
+        "to": "~/.claude/config/org.json",
+        "merge": true
+      },
+      {
+        "from": "config/model-routing.json",
+        "to": "~/.claude/config/model-routing.json"
+      },
+      {
+        "from": "config/capability-registry.json",
+        "to": "~/.claude/config/capability-registry.json"
+      },
+      {
+        "from": "scripts/stack-help.sh",
+        "to": "~/.claude/scripts/stack-help.sh",
+        "executable": true
+      },
+      {
+        "from": "config/help-groups.json",
+        "to": "~/.claude/config/help-groups.json"
+      },
+      {
+        "from": "skills/stack-help/SKILL.md",
+        "to": "~/.claude/skills/stack-help/SKILL.md"
+      },
+      {
+        "from": "skills/handbook/SKILL.md",
+        "to": "~/.claude/skills/handbook/SKILL.md"
+      },
+      {
+        "from": "config/aliases.json",
+        "to": "~/.claude/config/aliases.json"
+      },
+      {
+        "from": "skills/alias/SKILL.md",
+        "to": "~/.claude/skills/alias/SKILL.md"
+      },
+      {
+        "from": "scripts/gen-alias-stubs.sh",
+        "to": "~/.claude/scripts/gen-alias-stubs.sh",
+        "executable": true
+      },
+      {
+        "from": "tools/handbook/gen.mjs",
+        "to": "~/.claude/tools/handbook/gen.mjs"
+      },
+      {
+        "from": "tools/handbook/pptx.mjs",
+        "to": "~/.claude/tools/handbook/pptx.mjs"
+      },
+      {
+        "from": "tools/handbook/package.json",
+        "to": "~/.claude/tools/handbook/package.json"
+      },
+      {
+        "from": "tools/handbook/package-lock.json",
+        "to": "~/.claude/tools/handbook/package-lock.json"
+      },
+      {
+        "from": "tools/handbook/groups.json",
+        "to": "~/.claude/tools/handbook/groups.json"
+      }
+    ]
+  },
+  "requirements": [],
+  "smoke_tests": [
+    "test -f ~/.claude/CLAUDE.md",
+    "test -f ~/.claude/settings.json",
+    "test -x ~/.claude/hooks/session-prefs-init.sh",
+    "test -x ~/.claude/hooks/session-start-handoff.sh",
+    "test -x ~/.claude/hooks/session-marker.sh",
+    "test -x ~/.claude/lib/session-scope.sh",
+    "test -x ~/.claude/hooks/portable-core-refresh.sh",
+    "test -x ~/.claude/lib/portable-core.sh",
+    "test -f ~/.claude/config/portable-core-manifest.json",
+    "test -x ~/.claude/scripts/session-close.sh",
+    "test -f ~/.claude/skills/carbonight/SKILL.md",
+    "test -x ~/.claude/lib/plain-text-guard.sh",
+    "test -x ~/.claude/scripts/session-brief.sh",
+    "test -x ~/.claude/scripts/improvement-queue.sh",
+    "test -x ~/.claude/scripts/overnight-guard.sh",
+    "test -x ~/.claude/hooks/sandbox-policy-session-start.sh",
+    "test -x ~/.claude/hooks/sandbox-policy-recompile.sh",
+    "test -x ~/.claude/hooks/vendor-egress-cloud-guard.sh",
+    "test -x ~/.claude/hooks/brevity-reinforce.sh",
+    "test -x ~/.claude/hooks/brevity-drift.sh",
+    "test -x ~/.claude/hooks/simple-talk.sh",
+    "test -x ~/.claude/hooks/post-tool-tsc.sh",
+    "test -x ~/.claude/hooks/bulk-job-reminder.sh",
+    "test -x ~/.claude/hooks/statusline.sh",
+    "test -x ~/.claude/hooks/session-start-token-check.sh",
+    "test -x ~/.claude/lib/find-stack-config.sh",
+    "test -x ~/.claude/lib/domain-modes.sh",
+    "test -x ~/.claude/lib/stack-freshness.sh",
+    "test -x ~/.claude/lib/profile-resolver.sh",
+    "test -x ~/.claude/scripts/check-token-expiry.sh",
+    "test -x ~/.claude/scripts/cloud-bootstrap.sh",
+    "test -f ~/.claude/config/portable-core-skills.json",
+    "test -f ~/.claude/templates/project-cloud-settings.template.json",
+    "test -f ~/.claude/skills/handoff/SKILL.md",
+    "test -f ~/.claude/skills/goodmorning/SKILL.md",
+    "test -f ~/.claude/skills/todo/SKILL.md",
+    "test -f ~/.claude/skills/adhd/SKILL.md",
+    "test -f ~/.claude/skills/grilling/SKILL.md",
+    "test -f ~/.claude/skills/grill-me/SKILL.md",
+    "test -f ~/.claude/skills/operating/SKILL.md",
+    "test -f ~/.claude/skills/env-doctor/SKILL.md",
+    "test -f ~/.claude/skills/team-init/SKILL.md",
+    "test -x ~/.claude/templates/team-admin/scripts/reconcile.sh",
+    "test -f ~/.claude/skills/cloud-setup/SKILL.md",
+    "test -f ~/.claude/skills/claude-automation-recommender/SKILL.md",
+    "test -f ~/.claude/skills/claude-automation-recommender/references/hooks-patterns.md",
+    "test -f ~/.claude/skills/claude-api/SKILL.md",
+    "test -f ~/.claude/skills/claude-api/LICENSE.txt",
+    "test -f ~/.claude/skills/claude-api/ATTRIBUTION.md",
+    "test -f ~/.claude/skills/claude-api/python/claude-api/README.md",
+    "test -f ~/.claude/skills/claude-api/typescript/claude-api/README.md",
+    "test -f ~/.claude/skills/claude-api/shared/models.md",
+    "test -f ~/.claude/templates/PROJECT-CLAUDE.md.template",
+    "test -f ~/.claude/templates/PROJECT-ONBOARDING.md.template",
+    "test -f ~/.claude/templates/ADR.template.md",
+    "test -f ~/.claude/templates/RUNBOOK.template.md",
+    "test -f ~/.claude/skills/git-safety-net/SKILL.md",
+    "test -x ~/.claude/skills/git-safety-net/scripts/git_loss_audit.sh",
+    "test -f ~/.claude/agents/accessibility-auditor.md",
+    "test -f ~/.claude/agents/architect.md",
+    "test -f ~/.claude/agents/architecture-critic.md",
+    "test -f ~/.claude/agents/data-engineer.md",
+    "test -f ~/.claude/agents/designer.md",
+    "test -f ~/.claude/agents/documenter.md",
+    "test -f ~/.claude/agents/estimator.md",
+    "test -f ~/.claude/agents/foreman-team-lead.md",
+    "test -f ~/.claude/agents/historian.md",
+    "test -f ~/.claude/agents/implementer.md",
+    "test -f ~/.claude/agents/incident-commander.md",
+    "test -f ~/.claude/agents/integration-specialist.md",
+    "test -f ~/.claude/agents/librarian.md",
+    "test -f ~/.claude/agents/ops.md",
+    "test -f ~/.claude/agents/performance-engineer.md",
+    "test -f ~/.claude/agents/pm.md",
+    "test -f ~/.claude/agents/product-critic.md",
+    "test -f ~/.claude/agents/red-team.md",
+    "test -f ~/.claude/agents/reviewer.md",
+    "test -f ~/.claude/agents/scribe.md",
+    "test -f ~/.claude/agents/security-auditor.md",
+    "test -f ~/.claude/agents/tester.md",
+    "test -f ~/.claude/agents/user-docs-writer.md",
+    "test -f ~/.claude/agents/validator.md",
+    "test -f ~/.claude/skills/carbonet/SKILL.md",
+    "test -x ~/.claude/scripts/org-check.sh",
+    "test -x ~/.claude/lib/stack-config-validate.sh",
+    "test -f ~/.claude/config/org.json",
+    "test -f ~/.claude/config/capability-registry.json",
+    "test -f ~/.claude/config/model-routing.json",
+    "test -x ~/.claude/scripts/stack-help.sh",
+    "test -f ~/.claude/config/help-groups.json",
+    "test -f ~/.claude/skills/stack-help/SKILL.md",
+    "test -f ~/.claude/skills/handbook/SKILL.md",
+    "test -f ~/.claude/skills/hi/SKILL.md",
+    "test -f ~/.claude/skills/hello/SKILL.md",
+    "test -f ~/.claude/skills/bye/SKILL.md",
+    "test -f ~/.claude/skills/goodbye/SKILL.md",
+    "test -f ~/.claude/skills/docs/SKILL.md",
+    "test -f ~/.claude/tools/handbook/gen.mjs",
+    "test -f ~/.claude/tools/handbook/groups.json"
+  ]
+}

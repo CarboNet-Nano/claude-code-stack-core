@@ -1,0 +1,71 @@
+{
+  "$schema": "../schemas/loop-levels-schema.json",
+  "version": "1.0.0",
+  "description": "Named loop_policy presets for /loop-level. Each level materializes literal values into a project's .claude/stack-config.json loop_policy + cost_protection blocks — it is not read at loop-run time. loop-engineer/loop_lib.sh/loop-stop.sh/loop-cost-monitor.sh only ever read the resulting literal fields, unchanged by this file's existence. Raising a level is always safety-relevant (change_history + reason required). irreversible_actions_break_loop is a cross-level invariant, never set by a preset, and must never be forced to false by /loop-level regardless of level.",
+  "levels": {
+    "L1": {
+      "label": "Bounded — same caps as tier default, just no checkpoint pauses",
+      "loop_policy": {
+        "default_autonomy": "bounded-autonomous",
+        "autonomy_ceiling": "bounded-autonomous",
+        "max_iterations": 25,
+        "per_run_budget_usd": 5,
+        "timeout_minutes": 180
+      },
+      "cost_protection": {
+        "per_session_alert_usd": 5,
+        "per_day_alert_usd": 50,
+        "per_session_hard_cap_usd": null
+      }
+    },
+    "L2": {
+      "label": "Extended — longer unattended runs, moderate budget",
+      "loop_policy": {
+        "default_autonomy": "bounded-autonomous",
+        "autonomy_ceiling": "bounded-autonomous",
+        "max_iterations": 50,
+        "per_run_budget_usd": 15,
+        "timeout_minutes": 360
+      },
+      "cost_protection": {
+        "per_session_alert_usd": 15,
+        "per_day_alert_usd": 75,
+        "per_session_hard_cap_usd": 20
+      }
+    },
+    "L3": {
+      "label": "Large — half-day unattended jobs",
+      "loop_policy": {
+        "default_autonomy": "bounded-autonomous",
+        "autonomy_ceiling": "bounded-autonomous",
+        "max_iterations": 100,
+        "per_run_budget_usd": 40,
+        "timeout_minutes": 720
+      },
+      "cost_protection": {
+        "per_session_alert_usd": 40,
+        "per_day_alert_usd": 150,
+        "per_session_hard_cap_usd": 50
+      }
+    },
+    "L4": {
+      "label": "Maximum — full-day unattended jobs, highest cost exposure",
+      "loop_policy": {
+        "default_autonomy": "bounded-autonomous",
+        "autonomy_ceiling": "bounded-autonomous",
+        "max_iterations": 250,
+        "per_run_budget_usd": 100,
+        "timeout_minutes": 1440
+      },
+      "cost_protection": {
+        "per_session_alert_usd": 100,
+        "per_day_alert_usd": 300,
+        "per_session_hard_cap_usd": 120
+      }
+    }
+  },
+  "invariants": {
+    "irreversible_actions_break_loop": true,
+    "note": "Every level keeps pushes/merges/deploys/deletes gated. /loop-level must refuse to write irreversible_actions_break_loop: false at any level, and must refuse to write a null per_session_hard_cap_usd for L3 or L4 (both presets above already carry a non-null value; do not let a user override it to null when applying L3/L4)."
+  }
+}

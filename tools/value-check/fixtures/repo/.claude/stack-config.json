@@ -1,0 +1,9 @@
+{
+  "value": {
+    "probeDbUrlEnv": "MD_VALUE_PROBE_DB_URL",
+    "probeDbKeychainItem": "md-value-probe-db-url",
+    "probeRole": "md_value_probe",
+    "inventory": "docs/value/inventory.json",
+    "execChannel": "maintainer-relay"
+  }
+}

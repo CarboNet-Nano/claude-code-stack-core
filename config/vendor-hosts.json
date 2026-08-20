@@ -1,0 +1,66 @@
+{
+  "$schema": "../schemas/vendor-hosts-schema.json",
+  "version": "1.0.0",
+  "vendors": [
+    {
+      "host": "api.anthropic.com",
+      "vendor": "Anthropic",
+      "kind": "direct",
+      "is_runtime": true,
+      "cleared_at_sensitive": true,
+      "reviewed_on": "2026-08-11",
+      "terms_url": "https://www.anthropic.com/legal/commercial-terms",
+      "why": "first-party endpoint; the session runs on it (ADR-071 D4). Terms review 2026-08-11 (docs/reviews/2026-08-11-vendor-terms-review.md): no training on API data by default; 30-day retention. C4: Fable 5 / Mythos 5 are Covered Models — 30-day retention applies even under a ZDR arrangement (ZDR orgs get a 400 calling Fable)."
+    },
+    {
+      "host": "api.openai.com",
+      "vendor": "OpenAI",
+      "kind": "direct",
+      "is_runtime": false,
+      "cleared_at_sensitive": true,
+      "reviewed_on": "2026-08-11",
+      "terms_url": "https://developers.openai.com/api/docs/guides/your-data",
+      "why": "reviewer/security-auditor/product-critic (ADR-011/030). ADR-071 B2 terms review DONE 2026-08-11 (docs/reviews/2026-08-11-vendor-terms-review.md): no training on API data since 2023-03-01. C1: without ZDR, prompts sit in abuse logs 30 days and are human-reviewable — org accepts this window, or request ZDR + Modified Abuse Monitoring. C2: review traffic must stay on plain chat/responses calls — Assistants/Conversations/Vector Stores are not ZDR-eligible and retain state indefinitely."
+    },
+    {
+      "host": "generativelanguage.googleapis.com",
+      "vendor": "Google",
+      "kind": "direct",
+      "is_runtime": false,
+      "cleared_at_sensitive": false,
+      "reviewed_on": "2026-08-11",
+      "terms_url": "https://ai.google.dev/gemini-api/terms",
+      "why": "red-team/architecture-critic/historian (ADR-012). Terms review DONE 2026-08-11 (docs/reviews/2026-08-11-vendor-terms-review.md). PAID tier would be acceptable (no training on prompts/responses; 55-day abuse logs; but human review of logged data and no region pin). FREE tier is DISQUALIFIED: trains on data, human reviewers read input and output unconditionally, and its own terms forbid submitting sensitive or confidential information. Both tiers share this host AND key shape, so a host-level clearance cannot distinguish them -- and per ADR-071 D15 #6 the allowlist is the wrong layer for a credential property (that is Phase 3, where the credential is the control). Held at false until Phase 3 or a two-layer call-time gate ships; see docs/plans/2026-08-11-gemini-paid-tier-precondition.md. Do NOT set true without an ADR amendment: tests/test-sandbox-templates.sh T5g pins it."
+    },
+    {
+      "host": "api.deepseek.com",
+      "vendor": "DeepSeek",
+      "kind": "direct",
+      "is_runtime": false,
+      "cleared_at_sensitive": false,
+      "reviewed_on": null,
+      "terms_url": "https://platform.deepseek.com/downloads/DeepSeek%20Privacy%20Policy.html",
+      "why": "third review voice (ADR-026); ADR-029 residency finding -- stays false per maintainer B2 directive"
+    },
+    {
+      "host": "api.x.ai",
+      "vendor": "xAI",
+      "kind": "direct",
+      "is_runtime": false,
+      "cleared_at_sensitive": false,
+      "reviewed_on": null,
+      "terms_url": "https://x.ai/legal/terms-of-service",
+      "why": "fourth review voice (pilot); unvetted -- stays false per maintainer B2 directive"
+    },
+    {
+      "host": "openrouter.ai",
+      "vendor": "OpenRouter",
+      "kind": "aggregator",
+      "is_runtime": false,
+      "cleared_at_sensitive": false,
+      "reviewed_on": null,
+      "terms_url": "https://openrouter.ai/terms",
+      "why": "ADR-070 D10 -- declared and denied above normal"
+    }
+  ]
+}

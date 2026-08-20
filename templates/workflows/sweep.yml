@@ -1,0 +1,393 @@
+name: Sweep
+
+# The Sweep — stack ADR-078, spec docs/superpowers/specs/2026-08-15-sweep-design.md
+# S4.1 (CI packaging + required half), S4.3 (single-writer rule), S4.5
+# (cadences). Installed into a target repo by the stack installer (task
+# 11). Ships non-required and stays non-required until a check earns
+# `block` (S4.1) — but liveness ("did the Sweep even run") is required
+# from day one via the separate snippet job in
+# templates/workflows/snippets/run-tests-sweep-liveness.yml, added to
+# the repo's existing required run-tests.yml (the one edit to a
+# required workflow this design authorises, S4.1/S7.3).
+#
+# {{STACK_REF}}: placeholder for the pinned claude-code-stack git ref
+# (tag or commit sha) this repo is installed against. Neither
+# templates/ nor .github/workflows/ in the stack repo has existing
+# precedent for a target-repo template checking out a second,
+# stack-owning repo (searched both trees at implementation time,
+# 2026-08-15) — the closest analog, .github/workflows/template-contract-sync.yml,
+# checks out a *different* repo but from inside the stack repo itself,
+# not from a template destined for someone else's repo. This is
+# therefore a documented placeholder per architect ruling (task 9
+# dispatch): the stack installer (task 11) is expected to substitute
+# it with the pinned stack version/tag at install time. The
+# required-liveness snippet reuses the identical placeholder for the
+# same reason.
+#
+# SUBSTITUTION CONTRACT — FAIL LOUD (task 11). Two directions, and they
+# are not symmetric:
+#   INTO ~/.claude (the stack install, wired in config/tier-manifests/
+#   tier-2.json): this file is copied VERBATIM and the placeholder MUST
+#   survive. tier-2's smoke_tests assert `grep -q '{{STACK_REF}}'` on
+#   both installed templates, so a stack install that rendered them
+#   early fails `scripts/verify.sh` rather than shipping a file that
+#   looks final but pins nothing.
+#   INTO A TARGET REPO's .github/workflows/: the copying path MUST
+#   substitute {{STACK_REF}} with a pinned tag or commit sha AND MUST
+#   refuse to write the file if any `{{...}}` token remains — an
+#   unsubstituted `ref:` resolves to nothing, the checkout step fails,
+#   and a workflow that cannot check out the stack is the NEVER RAN
+#   failure this whole design exists to make impossible.
+#   OWNED since 2026-08-16: scripts/sweep-install.sh is that copying
+#   path for existing repos (render + refuse-on-leftover-token,
+#   tests/test-sweep-install.sh), and carbonet-provisioner's sweep-gate
+#   step is the same contract for freshly generated repos. Both
+#   implement the refusal above as a real guard.
+#
+# Producer contract (frozen by task 8, scripts/sweep/sweep-liveness.sh
+# header): the push-main and schedule jobs below invoke sweep-run.sh
+# with `--json` and do not redirect stdout away, so the job's own log
+# (captured verbatim by GitHub Actions) carries the compact
+# `{"schema":"sweep-run/v1", ..., "checks":[...]}` line
+# sweep-liveness.sh reads back via `gh api .../workflows/sweep.yml/runs`
+# + `gh run view <id> --log`. No artifact upload/download, no archive
+# extraction step, no new marker — this is the runner's existing,
+# unmodified `--json` output.
+#
+# Single-writer rule (S4.3, RT-2): the `pull_request` job renders and
+# exits — it contains no `git commit`/`git push` step. The only
+# committing paths are `push: [main]` and `schedule`, both carrying
+# `concurrency: {group: sweep-findings-write, cancel-in-progress: false}`
+# so committing runs serialise; there is no concurrent append, so there
+# is nothing to merge. `sweep-run.sh` itself never calls git — it only
+# writes `.claude/sweep/findings.jsonl` to disk for the push-main |
+# nightly | session-close cadences (S5.4); committing that file is this
+# workflow's own job, below. If a push is rejected (a human pushed
+# between checkout and push), the step exits 2 and prints the fixed
+# S4.6 plain sentence rather than retrying, rebasing, or force-pushing
+# — a findings write that did not land is a liveness failure, reported
+# as one.
+#
+# GITIGNORE CONTRACT (task 11 controller ruling). `sweep-run.sh` writes
+# TWO files under the target repo's `.claude/sweep/`, and only one of
+# them is meant to be committed:
+#   .claude/sweep/findings.jsonl — COMMITTED. The append-only book of
+#     findings (spec S4.3, Q4 answer (a)); the writer jobs above commit
+#     it, and it must NOT be gitignored.
+#   .claude/sweep/runs.jsonl — GITIGNORED. Per-run telemetry written by
+#     `write_run_row()` on EVERY cadence including `pr`, so leaving it
+#     tracked would make the render-only PR job dirty the tree and turn
+#     the single-writer rule into a lie.
+# Installing this workflow into a target repo therefore also adds the
+# line `.claude/sweep/runs.jsonl` to that repo's `.gitignore`. Stated
+# here, in the template the target repo receives, because there is no
+# other artifact the target repo gets that could carry it.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Nightly — the load-bearing carrier for family D and B3 (S4.5).
+    # Time is an installer/repo-owner choice; this default runs at
+    # 03:07 UTC, off the top of the hour to avoid GitHub's scheduled-job
+    # pile-up window.
+    - cron: "7 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  pr:
+    # "observe — does not block": this job's tick is green whenever the
+    # sweep RAN, not when its checks passed (mode: observe, renders only).
+    # The name says so, because a bare "sweep ✓" next to a run with
+    # failing checks reads as "sweep found nothing" — the counts live in
+    # the PR comment's first line (see the render step below).
+    name: sweep (observe — does not block)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    # Fix round 2, CRITICAL (triaged mitigation). sweep-run.sh hands every
+    # check a `budget_ms` in its job envelope and then enforces nothing: a
+    # check that hangs hangs the job until GitHub's 6-hour default, and a
+    # Sweep still "running" six hours later is the NEVER RAN failure with
+    # a spinner on it. Until the runner enforces the budget itself, the
+    # job-level wall clock is the enforcement. 15 minutes is ~7x the
+    # 120s per-check budget across the phase-1 inventory, so it can only
+    # fire on a genuine hang, never on a slow-but-working run.
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      # B4 and sweep-liveness read GitHub Actions runs via the API; with
+      # an explicit permissions block, actions defaults to none and those
+      # calls 403 into false failures (209 of them on the first month of
+      # real history, before B4 learned to report the failed call itself).
+      actions: read
+      # pull-requests: write is scoped to this job only (never the
+      # writer jobs below) and used for exactly one thing: upserting
+      # the G7 PR comment. Repo contents stays read-only here, so this
+      # job still cannot touch findings.jsonl — spec S4.3's
+      # single-writer rule holds regardless of comment permissions
+      # (task 12, controller ruling after task 9 review).
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # B4 needs main history; a shallow PR-head checkout has no main at all
+          # Do NOT bake GITHUB_TOKEN into git's auth config: it overrides
+          # the app token in the writer's push URL, and the push then hits
+          # the PR-only rule as the wrong identity (round-9 live failure).
+          persist-credentials: false
+
+      - name: Checkout stack scripts (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: get-lade/claude-code-stack
+          ref: "{{STACK_REF}}"
+          ssh-key: ${{ secrets.SWEEP_STACK_DEPLOY_KEY }}
+          path: .sweep-stack
+
+      # Fix round 2, CRITICAL: `set -o pipefail` is load-bearing here, not
+      # style. GitHub runs `run:` bodies under `bash -e {0}` — `-e` without
+      # `pipefail` — so the status of `sweep-run.sh ... | tee` is TEE's,
+      # and tee returns 0 whether the runner exited 0, 1, 2 or 3. Without
+      # this line the pr job is green on a liveness failure: the exact
+      # NEVER RAN shape this workflow exists to prevent, wearing the
+      # workflow's own uniform.
+      - name: Run sweep (pr cadence — render only, single-writer rule)
+        id: sweep-run-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          .sweep-stack/scripts/sweep/sweep-run.sh --cadence pr --repo "$GITHUB_WORKSPACE" --json | tee "$RUNNER_TEMP/sweep-pr.json"
+
+      # G7 PR-comment rendering (task 12). The no-software-skills user
+      # never opens a CI job log — the PR comment is the one surface
+      # they see, so spec S4.3's second half is load-bearing, not
+      # optional (Task-9 reviewer ruling). Renders via sweep-render.sh
+      # (task 5, sourced — it has no CLI of its own) against the
+      # run_id the previous step just produced, then UPSERTS a single
+      # PR comment: find an existing comment carrying the hidden
+      # <!-- sweep-g7 --> marker and PATCH it in place; POST a new one
+      # only when none exists. Never a new comment per run.
+      #
+      # Fix round 1, CRITICAL: on exit 2 (vacuous check, check-error,
+      # undeclared-skip, blank-exclusion) the pr cadence writes no
+      # finding (WRITES_FINDINGS=false for pr), so sweep_render's
+      # run-backed path alone would post a false-clean "Found nothing
+      # worth your attention" comment on a run that just FAILED
+      # liveness. `.exit_code`/`.sentence` come straight from the
+      # sweep-run JSON captured by the previous step; when exit_code is
+      # 2 (or a sentence is present at all), the comment LEADS with that
+      # plain-English liveness sentence, ahead of the G7 block, rather
+      # than letting the G7 block's own silence read as "all clear".
+      #
+      # Fix round 1, IMPORTANT: a fork PR's default GITHUB_TOKEN is
+      # read-only, so the gh api calls below 403 on those PRs.
+      # continue-on-error keeps that failure from turning an otherwise
+      # clean pr job red — the sweep-run-pr step above remains the
+      # job's actual verdict; this step only ever adds a comment.
+      # Fix round 2, IMPORTANT: on exit 3 (a configuration the runner
+      # refuses) sweep-run.sh exits BEFORE render_json, so sweep-pr.json is
+      # a zero-byte file. `jq -r '.exit_code'` on an empty file prints
+      # nothing and exits 0, so every branch below read empty strings, the
+      # exit-2 test was false, and the comment posted sweep_render's
+      # cheerful "Found nothing worth your attention" for a run that never
+      # produced a single result. The guard is therefore positive, not
+      # negative: a G7 block is posted ONLY when the file is non-empty AND
+      # parses as an object AND exit_code is 0 or 1 AND a run row for that
+      # run_id actually exists. Everything else — empty file, unparseable
+      # file, exit 2, exit 3, missing run row — gets an honest plain
+      # sentence and NO G7 block, because a G7 block on a run that did not
+      # happen is the NEVER RAN failure with a friendly voice.
+      - name: Render + comment G7 block on the PR (upsert by hidden marker)
+        id: sweep-comment-pr
+        if: always() && github.event.pull_request.number
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+
+          RUN_JSON="$RUNNER_TEMP/sweep-pr.json"
+          RUNS_FILE="$GITHUB_WORKSPACE/.claude/sweep/runs.jsonl"
+          MARKER="<!-- sweep-g7 -->"
+          COULD_NOT_RUN="The safety checks could not run on this pull request, so nothing on it has been checked. A green tick here means nothing until this is fixed."
+
+          RUN_ID=""; EXIT_CODE=""; SENTENCE=""
+          if [[ -s "$RUN_JSON" ]] && jq -e 'type == "object"' "$RUN_JSON" >/dev/null 2>&1; then
+            RUN_ID="$(jq -r '.run_id // empty' "$RUN_JSON")"
+            EXIT_CODE="$(jq -r '.exit_code // empty' "$RUN_JSON")"
+            SENTENCE="$(jq -r '.sentence // empty' "$RUN_JSON")"
+          fi
+
+          HAS_RUN_ROW=false
+          if [[ -n "$RUN_ID" && -f "$RUNS_FILE" ]] \
+            && jq -se --arg r "$RUN_ID" '[.[] | select(.run_id == $r)] | length > 0' "$RUNS_FILE" >/dev/null 2>&1; then
+            HAS_RUN_ROW=true
+          fi
+
+          if [[ ( "$EXIT_CODE" == "0" || "$EXIT_CODE" == "1" ) && "$HAS_RUN_ROW" == "true" ]]; then
+            # shellcheck source=/dev/null
+            source .sweep-stack/scripts/sweep/sweep-render.sh
+            RENDERED="$(sweep_render "$GITHUB_WORKSPACE" --run "$RUN_ID")"
+            # Observe mode's green tick means "ran", never "passed" — so
+            # when any check failed, the comment's FIRST line carries the
+            # counts, ahead of the G7 block, where a reader who never opens
+            # a job log actually sees them.
+            FAILED_N="$(jq -r '[.checks[]? | select(.status == "fail")] | length' "$RUN_JSON")"
+            TOTAL_N="$(jq -r '.checks | length' "$RUN_JSON")"
+            FINDINGS_N="$(jq -r '.findings_n // 0' "$RUN_JSON")"
+            if [[ "$FAILED_N" =~ ^[0-9]+$ && "$FAILED_N" -gt 0 ]]; then
+              HEADLINE="⚠️ $FAILED_N of $TOTAL_N checks failed ($FINDINGS_N findings) — observe mode, does not block this merge."
+              COMMENT_BODY="$(printf '%s\n%s\n\n%s' "$MARKER" "$HEADLINE" "$RENDERED")"
+            else
+              COMMENT_BODY="$(printf '%s\n%s' "$MARKER" "$RENDERED")"
+            fi
+          else
+            COMMENT_BODY="$(printf '%s\n%s' "$MARKER" "${SENTENCE:-$COULD_NOT_RUN}")"
+          fi
+
+          REPO="${{ github.repository }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          EXISTING_ID="$(gh api "repos/$REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq "[.[] | select(.body | startswith(\"$MARKER\"))][0].id // empty")"
+
+          if [[ -n "$EXISTING_ID" ]]; then
+            gh api --method PATCH "repos/$REPO/issues/comments/$EXISTING_ID" -f body="$COMMENT_BODY"
+          else
+            gh api --method POST "repos/$REPO/issues/$PR_NUMBER/comments" -f body="$COMMENT_BODY"
+          fi
+
+  push-main:
+    name: sweep (push main — writer)
+    # The second clause is the loop breaker: the writer's own findings
+    # commit is a push to main, which triggers this workflow again; and
+    # that commit is a new landing B4 flags, so without the guard every
+    # cycle writes one new finding and commits forever (round-10 live).
+    # Skipping the writer still leaves this workflow RUN on the findings
+    # commit, which is exactly what B4 needs to count it as covered.
+    if: github.event_name == 'push' && !startsWith(github.event.head_commit.message, 'chore(sweep):')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15   # see the pr job — budget_ms is unenforced, this is the wall clock
+    concurrency:
+      group: sweep-findings-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read   # B4 + liveness query Actions runs; explicit blocks default actions to none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # B4 needs main history; a shallow PR-head checkout has no main at all
+          # Do NOT bake GITHUB_TOKEN into git's auth config: it overrides
+          # the app token in the writer's push URL, and the push then hits
+          # the PR-only rule as the wrong identity (round-9 live failure).
+          persist-credentials: false
+
+      - name: Checkout stack scripts (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: get-lade/claude-code-stack
+          ref: "{{STACK_REF}}"
+          ssh-key: ${{ secrets.SWEEP_STACK_DEPLOY_KEY }}
+          path: .sweep-stack
+
+      - name: Mint app token (a findings push must trigger workflows and bypass the PR-only rule)
+        id: writer-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+
+      - name: Run sweep and commit findings (writer, single-writer rule)
+        id: sweep
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WRITER_TOKEN: ${{ steps.writer-token.outputs.token }}
+        run: |
+          set -uo pipefail
+          # #223: the step runs under bash -e; capture on the same line so a
+          # nonzero sweep-run cannot kill the step before findings commit.
+          rc=0
+          .sweep-stack/scripts/sweep/sweep-run.sh --cadence push-main --repo "$GITHUB_WORKSPACE" --json || rc=$?
+          set -e
+
+          if git -C "$GITHUB_WORKSPACE" status --porcelain -- .claude/sweep/findings.jsonl | grep -q .; then
+            git -C "$GITHUB_WORKSPACE" config user.email "sweep@users.noreply.github.com"
+            git -C "$GITHUB_WORKSPACE" config user.name "sweep-bot"
+            git -C "$GITHUB_WORKSPACE" add .claude/sweep/findings.jsonl
+            git -C "$GITHUB_WORKSPACE" commit -m "chore(sweep): record findings — push-main"
+            if ! git -C "$GITHUB_WORKSPACE" push "https://x-access-token:${WRITER_TOKEN}@github.com/${GITHUB_REPOSITORY}" HEAD:main; then
+              echo "The list of findings could not be saved on $(date -u +%Y-%m-%d). Nothing was lost, but nothing was recorded either." >&2
+              exit 2
+            fi
+          fi
+
+          exit "$rc"
+
+  schedule:
+    name: sweep (nightly — writer)
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15   # see the pr job — budget_ms is unenforced, this is the wall clock
+    concurrency:
+      group: sweep-findings-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read   # B4 + liveness query Actions runs; explicit blocks default actions to none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # B4 needs main history; a shallow PR-head checkout has no main at all
+          # Do NOT bake GITHUB_TOKEN into git's auth config: it overrides
+          # the app token in the writer's push URL, and the push then hits
+          # the PR-only rule as the wrong identity (round-9 live failure).
+          persist-credentials: false
+
+      - name: Checkout stack scripts (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: get-lade/claude-code-stack
+          ref: "{{STACK_REF}}"
+          ssh-key: ${{ secrets.SWEEP_STACK_DEPLOY_KEY }}
+          path: .sweep-stack
+
+      - name: Mint app token (a findings push must trigger workflows and bypass the PR-only rule)
+        id: writer-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+
+      - name: Run sweep and commit findings (writer, single-writer rule)
+        id: sweep
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WRITER_TOKEN: ${{ steps.writer-token.outputs.token }}
+        run: |
+          set -uo pipefail
+          # #223: the step runs under bash -e; capture on the same line so a
+          # nonzero sweep-run cannot kill the step before findings commit.
+          rc=0
+          .sweep-stack/scripts/sweep/sweep-run.sh --cadence nightly --repo "$GITHUB_WORKSPACE" --json || rc=$?
+          set -e
+
+          if git -C "$GITHUB_WORKSPACE" status --porcelain -- .claude/sweep/findings.jsonl | grep -q .; then
+            git -C "$GITHUB_WORKSPACE" config user.email "sweep@users.noreply.github.com"
+            git -C "$GITHUB_WORKSPACE" config user.name "sweep-bot"
+            git -C "$GITHUB_WORKSPACE" add .claude/sweep/findings.jsonl
+            git -C "$GITHUB_WORKSPACE" commit -m "chore(sweep): record findings — nightly"
+            if ! git -C "$GITHUB_WORKSPACE" push "https://x-access-token:${WRITER_TOKEN}@github.com/${GITHUB_REPOSITORY}" HEAD:main; then
+              echo "The list of findings could not be saved on $(date -u +%Y-%m-%d). Nothing was lost, but nothing was recorded either." >&2
+              exit 2
+            fi
+          fi
+
+          exit "$rc"

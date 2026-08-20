@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "claimId": "md-daily-march-autosettle-v1",
+  "repo": "manufacturing-dashboard",
+  "feature": "daily-march auto-settlement",
+  "specRef": "docs/ADRs/050-daily-march-lean.md",
+  "valueKind": "internal-efficiency",
+  "attribution": "direct-measure",
+  "attributionNote": null,
+  "statement": "The daily march settles CSP fulfillments and CP/P consumption automatically, writing one ledger row per real settle or consume; before it shipped, each settle was a manual reconciliation action.",
+  "metric":   { "name": "auto_settled_writes_since_launch", "unit": "writes", "direction": "higher-is-better" },
+  "baseline": { "value": 0, "source": "no daily_march_ledger rows exist before 2026-06-25", "asOf": "2026-06-24" },
+  "target":   { "value": 50, "by": "2026-09-01", "minN": 4 },
+  "probe":    { "path": "docs/value/probes/md-daily-march-autosettle-v1.sql", "kind": "sql-readonly", "sha256": null },
+  "probeTables": ["public.daily_march_ledger"],
+  "freshness":{ "source": "daily_march_ledger", "maxStalenessDays": 3 },
+  "ratifiedBy": "bill@carbonet.com",
+  "ratifiedAt": "2026-07-20T09:00:00Z",
+  "ratifiedCommit": "a289c5f0d64dbb12addc246573a23634e5b83504",
+  "supersedes": null,
+  "notScorableBefore": "2026-07-25"
+}

@@ -1,0 +1,27 @@
+# The installed check inventory (stack ADR-078, spec S4.2 invariant 6).
+# One check id per line. THIS FILE — not any repo's config — is the
+# universe of checks: every id here must appear in a repo's
+# sweep.config.json either as a family block or as a `skips` entry with a
+# non-empty reason, and B5 (sweep-liveness.sh) asserts against this list
+# minus those reasoned skips. There is no `enabled` flag [RT-5].
+#
+# Adding a check = adding a line here plus an executable
+# scripts/sweep/checks/<id-lowercased>-*.{sh,mjs}. Phase 1 ships the two
+# built checks; phase 2 appends A1/A2/A4, phase 3 appends B3/C2/C3/D0a/D0b;
+# A5 appends in ADR-082/doctrine v2 P1a (command-has-interface-caller,
+# audit #4). B6 is reserved for roster-keeper-liveness and must never
+# appear here (synthesis RD6).
+#
+# PC1 (2026-08-18 new-user-setup-rev2 plan, task 6): stale/diverged
+# vendored portable-core skill copies (ADR-075). Outside the A-G family
+# lettering the sweep-design spec assigns for phases 1-3; found_by is
+# sweep-family-B (meta/process integrity of the stack's own tooling, the
+# same bucket B4/B5 occupy). Declarable as `families.PC1` in a repo's
+# sweep.config.json (schemas/sweep-config.json carries the family entry).
+B4
+E1
+A1
+A2
+A4
+A5
+PC1

@@ -1,0 +1,25 @@
+{
+  "name": "@stack/user-docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ADR-045 user-docs runner: replays *.docs.ts Playwright specs to regenerate and freshness-check user-guide screenshots.",
+  "bin": {
+    "user-docs-run": "./bin.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "user-docs-run": "tsx bin.ts"
+  },
+  "dependencies": {
+    "@playwright/test": "1.56.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.3.0",
+    "tsx": "4.20.3",
+    "typescript": "5.9.2"
+  }
+}

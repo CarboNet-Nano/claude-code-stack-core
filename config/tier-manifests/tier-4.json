@@ -1,0 +1,194 @@
+{
+  "tier": 4,
+  "name": "Self-Improving",
+  "description": "3 meta subagents + monthly model + perf audits. Requires 30 days of subagent_runs data to be meaningful.",
+  "extends": "tier-3",
+  "files": {
+    "global": [
+      {
+        "from": "skills/model-audit/SKILL.md",
+        "to": "~/.claude/skills/model-audit/SKILL.md"
+      },
+      {
+        "from": "skills/agent-performance-review/SKILL.md",
+        "to": "~/.claude/skills/agent-performance-review/SKILL.md"
+      },
+      {
+        "from": "skills/effort-eval/SKILL.md",
+        "to": "~/.claude/skills/effort-eval/SKILL.md"
+      },
+      {
+        "from": "skills/model-eval/SKILL.md",
+        "to": "~/.claude/skills/model-eval/SKILL.md"
+      },
+      {
+        "from": "tools/pm/package.json",
+        "to": "~/.claude/tools/pm/package.json"
+      },
+      {
+        "from": "tools/pm/bin.mjs",
+        "to": "~/.claude/tools/pm/bin.mjs",
+        "executable": true
+      },
+      {
+        "from": "tools/pm/src/board.mjs",
+        "to": "~/.claude/tools/pm/src/board.mjs"
+      },
+      {
+        "from": "tools/pm/src/brief.mjs",
+        "to": "~/.claude/tools/pm/src/brief.mjs"
+      },
+      {
+        "from": "tools/pm/src/cli.mjs",
+        "to": "~/.claude/tools/pm/src/cli.mjs"
+      },
+      {
+        "from": "tools/pm/src/db.mjs",
+        "to": "~/.claude/tools/pm/src/db.mjs"
+      },
+      {
+        "from": "tools/pm/src/directory.mjs",
+        "to": "~/.claude/tools/pm/src/directory.mjs"
+      },
+      {
+        "from": "tools/pm/src/fence.mjs",
+        "to": "~/.claude/tools/pm/src/fence.mjs"
+      },
+      {
+        "from": "tools/pm/src/journal.mjs",
+        "to": "~/.claude/tools/pm/src/journal.mjs"
+      },
+      {
+        "from": "tools/pm/src/journal-pg.mjs",
+        "to": "~/.claude/tools/pm/src/journal-pg.mjs"
+      },
+      {
+        "from": "tools/pm/src/matrix.mjs",
+        "to": "~/.claude/tools/pm/src/matrix.mjs"
+      },
+      {
+        "from": "tools/pm/src/matrix-edit.mjs",
+        "to": "~/.claude/tools/pm/src/matrix-edit.mjs"
+      },
+      {
+        "from": "tools/pm/src/migrate.mjs",
+        "to": "~/.claude/tools/pm/src/migrate.mjs"
+      },
+      {
+        "from": "tools/pm/src/outbox.mjs",
+        "to": "~/.claude/tools/pm/src/outbox.mjs"
+      },
+      {
+        "from": "tools/pm/src/portfolio.mjs",
+        "to": "~/.claude/tools/pm/src/portfolio.mjs"
+      },
+      {
+        "from": "tools/pm/src/provision.mjs",
+        "to": "~/.claude/tools/pm/src/provision.mjs"
+      },
+      {
+        "from": "tools/pm/src/spend.mjs",
+        "to": "~/.claude/tools/pm/src/spend.mjs"
+      },
+      {
+        "from": "tools/pm/src/tracks.mjs",
+        "to": "~/.claude/tools/pm/src/tracks.mjs"
+      },
+      {
+        "from": "tools/pm/src/vendor-verify.mjs",
+        "to": "~/.claude/tools/pm/src/vendor-verify.mjs"
+      },
+      {
+        "from": "tools/pm/templates/track.md",
+        "to": "~/.claude/tools/pm/templates/track.md"
+      },
+      {
+        "from": "config/portfolio.json",
+        "to": "~/.claude/config/portfolio.json"
+      },
+      {
+        "from": "config/knowledge-store.json",
+        "to": "~/.claude/config/knowledge-store.json"
+      },
+      {
+        "from": "config/behavior-matrix.json",
+        "to": "~/.claude/config/behavior-matrix.json"
+      },
+      {
+        "from": "templates/job-spec.md",
+        "to": "~/.claude/templates/job-spec.md"
+      },
+      {
+        "from": "schemas/006-roles.sql",
+        "to": "~/.claude/schemas/006-roles.sql"
+      },
+      {
+        "from": "schemas/006-knowledge-store.sql",
+        "to": "~/.claude/schemas/006-knowledge-store.sql"
+      }
+    ],
+    "global_dirs": [
+      {
+        "from": "tools/pm/src/vendor",
+        "to": "~/.claude/tools/pm/src/vendor"
+      }
+    ],
+    "schemas": [
+      {
+        "from": "schemas/002-subagent-runs.sql",
+        "apply_to_db": true
+      },
+      {
+        "from": "schemas/003-model-audits.sql",
+        "apply_to_db": true
+      }
+    ]
+  },
+  "requirements": [
+    { "type": "postgres_database", "name": "org knowledge store (Neon)" }
+  ],
+  "smoke_tests": [
+    "test -f ~/.claude/skills/model-audit/SKILL.md",
+    "test -f ~/.claude/skills/agent-performance-review/SKILL.md",
+    "test -f ~/.claude/skills/effort-eval/SKILL.md",
+    "test -f ~/.claude/skills/model-eval/SKILL.md",
+    "test -f ~/.claude/tools/pm/package.json",
+    "test -x ~/.claude/tools/pm/bin.mjs",
+    "test -f ~/.claude/tools/pm/src/board.mjs",
+    "test -f ~/.claude/tools/pm/src/brief.mjs",
+    "test -f ~/.claude/tools/pm/src/cli.mjs",
+    "test -f ~/.claude/tools/pm/src/db.mjs",
+    "test -f ~/.claude/tools/pm/src/directory.mjs",
+    "test -f ~/.claude/tools/pm/src/fence.mjs",
+    "test -f ~/.claude/tools/pm/src/journal.mjs",
+    "test -f ~/.claude/tools/pm/src/journal-pg.mjs",
+    "test -f ~/.claude/tools/pm/src/matrix.mjs",
+    "test -f ~/.claude/tools/pm/src/matrix-edit.mjs",
+    "test -f ~/.claude/tools/pm/src/migrate.mjs",
+    "test -f ~/.claude/tools/pm/src/outbox.mjs",
+    "test -f ~/.claude/tools/pm/src/portfolio.mjs",
+    "test -f ~/.claude/tools/pm/src/provision.mjs",
+    "test -f ~/.claude/tools/pm/src/spend.mjs",
+    "test -f ~/.claude/tools/pm/src/tracks.mjs",
+    "test -f ~/.claude/tools/pm/templates/track.md",
+    "test -f ~/.claude/config/portfolio.json",
+    "node -e \"import('node:sqlite').then(()=>process.exit(0),()=>process.exit(1))\"",
+    "test -f ~/.claude/config/knowledge-store.json",
+    "test -f ~/.claude/config/behavior-matrix.json",
+    "test -f ~/.claude/templates/job-spec.md",
+    "test -f ~/.claude/schemas/006-roles.sql",
+    "test -f ~/.claude/schemas/006-knowledge-store.sql",
+    "find ~/.claude/tools/pm/src/vendor -type f -name '*.mjs' -print -quit | grep -q .",
+    "test -f ~/.claude/tools/pm/src/vendor-verify.mjs",
+    "node ~/.claude/tools/pm/src/vendor-verify.mjs ~/.claude/tools/pm/src/vendor",
+    "STACK_DB_URL='postgresql://invalid:invalid@127.0.0.1:1/x' node ~/.claude/tools/pm/bin.mjs brief --portfolio carbonet",
+    "node ~/.claude/tools/pm/bin.mjs brief --portfolio carbonet"
+  ],
+  "notes": {
+    "smoke_tests": "Artifact 4's tier-4 manifest included `psql_check_table_exists` smoke tests — that is not a real shell command and verify.sh runs smoke tests via eval, so it would fail. Dropped here; Supabase table creation is verified separately via the Supabase MCP at install time (see Tier 4 install log).",
+    "schema_location": "002/003 create tables in the `stack` schema (stack.subagent_runs, stack.model_audits) for consistency with 001-cost-log.sql — Artifact 4 used bare public-schema names.",
+    "pm_layer": "P1a Task 9 (REQ-116, REQ-100). tools/pm/ mirrors the tools/value-check/ and tools/user-docs/ precedent (tier-3): copy-only, each src/*.mjs file listed individually (tier-installer.sh has no recursive-directory copy), test/ intentionally NOT manifested (repo-only, same reasoning as tools/value-check/fixtures/**). tools/pm/bin.mjs is executable (shebang `#!/usr/bin/env node`), same as tools/value-check/src/score.mjs. tools/pm/templates/track.md installs alongside the tool at ~/.claude/tools/pm/templates/track.md (not top-level ~/.claude/templates/) — the plan doc's 'templates/track.md' referred to this file before Task 3 landed it under tools/pm/templates/ instead of repo-root templates/; top-level templates/ is already fully installed at tier-0 and needs no new entries here. config/portfolio.json installs to ~/.claude/config/portfolio.json (plain copy, no merge — same treatment as config/domain-modes.json at tier-3): tools/pm/src/cli.mjs's DEFAULT_CONFIG_PATH is `join(__dirname, '..', '..', '..', 'config', 'portfolio.json')`, which resolves from the installed ~/.claude/tools/pm/src/ to exactly this path. The `node -e \"import('node:sqlite')...\"` smoke test enforces the Node >=22.5 floor tools/pm/package.json declares (node:sqlite is the journal's only dependency, per ADR-059) — it is a hard smoke test, not advisory, because the PM layer is unusable without it and Tier 4 is opt-in (a machine choosing Tier 4 is choosing the PM layer).",
+    "p1b_install_wiring": "P1b Task 18 (ADR-060, REQ-120). The original P1a Task 9 entry above only listed the seven tools/pm/src/*.mjs files that existed when it was written; P1b Tasks 3/4/6/9/10/11/12/13 added db.mjs, directory.mjs, journal-pg.mjs, matrix.mjs, matrix-edit.mjs, migrate.mjs, outbox.mjs, provision.mjs, and spend.mjs to tools/pm/src/ without anyone updating this manifest, so a real install's bin.mjs failed at import time (ERR_MODULE_NOT_FOUND on directory.mjs) until this task added the missing nine entries + smoke tests below. agents/pm.md, config/knowledge-store.json, config/behavior-matrix.json, and templates/job-spec.md are plain files.global copies, same treatment as their P1a siblings above. schemas/006-{roles,knowledge-store}.sql copy to ~/.claude/schemas/ as reference material only (same as tier-0's schemas/*-schema.json) — they are NOT added to the `schemas` apply_to_db array above. AMENDED 2026-08-10 (Supabase retired, Neon move): that mechanism used to resolve SUPABASE_URL + the supabase-service-role-key Keychain item, and applying the knowledge-store schema through it would have hit the wrong database. It now resolves STACK_DB_URL / the stack-db-url-<org> Keychain item -- the SAME credential the knowledge store uses -- so that original reason no longer holds. These two stay out of the array for a different and still-valid reason: 006-roles.sql must be applied by the provider admin identity (stack_migrator cannot create its own role, ADR-060 addendum A), which is a human bootstrap step by definition, not something an installer can do. See config/knowledge-store.json. The vendored database driver under tools/pm/src/vendor/** (ADR-060 §D) is copied via the new `files.global_dirs` mechanism instead of being enumerated file-by-file: naming its files individually here would put the vendored package's own name inside config/, one of the trees tools/pm/test's vendor-literal lint scans, whose grandfather list is explicitly closed ('may only shrink; must never grow'). Naming only the directory (tools/pm/src/vendor, not the package subdirectory inside it) keeps this manifest off that lint's radar without touching the allowlist. The matching smoke tests are written the same way — `find`/`node` over the vendor directory, never spelling the package's name — and check for an *.mjs file (driver source landed) and, as of the issue #152 fix, that vendor-verify.mjs's compute-and-compare passes (recomputes each vendored file's sha256 and compares against the per-file checksum UPSTREAM.md records, not merely that a `sha256:` line exists — the original 'checksum line verified' smoke test only ever checked presence, never correctness, so a corrupted or tampered vendor copy would silently pass install; scripts/lib/tier-installer.sh's global_dirs copy step now also runs this same check immediately after the `cp -R`, so install itself refuses a hash-mismatched driver rather than only flagging it in a later `verify.sh` pass). The final two smoke tests both run `pm brief --portfolio carbonet` and are both hard (not advisory) checks, because tools/pm/bin.mjs's brief path degrades to exit 0 even when the knowledge store is unreachable (unreachableJournal in bin.mjs) — so both must pass regardless of whether the operator has provisioned a knowledge store yet, by design. They deliberately cover two different branches rather than relying on ambient machine state: the first pins `STACK_DB_URL` to an unroutable address (env overrides the stack-db-url-<org> Keychain item), forcing and proving the unreachable-store degrade branch deterministically on every install, on every machine, regardless of whether real Keychain creds are present. The second runs bare, exercising whatever the ambient environment actually provides (the live store on a provisioned machine, or the same degrade path on one that isn't) — kept alongside the forced check rather than replacing it, since the ambient path is what an operator actually experiences post-install. Fixed 2026-08-08 per review: the original single bare-only smoke test only ever exercised the happy path on any machine with live Keychain creds (this one included, post-Task-7), never proving the degrade branch the brief explicitly requires."
+  },
+  "post_install_note": "Tier 4 skills (model-audit, agent-performance-review) need ~30 days of cost_log and subagent_runs data to produce meaningful output. Set a calendar reminder for first run."
+}

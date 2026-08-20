@@ -1,0 +1,29 @@
+{
+  "$comment": "ADR-071 D11/D12. Ships as a TEMPLATE ONLY -- never written by the stack, a hook, or scripts/install.sh. A human installs this file, verbatim or after review, at /Library/Application Support/ClaudeCode/managed-settings.json (root-owned, chmod 644). See docs/runbooks/managed-floor-install.md for the sudo install, the pre-install verification checklist, and the uninstall path. Do NOT set allowManagedDomainsOnly -- it is machine-global and all-or-nothing, and would impose 'confidential' on every repo on the machine.",
+  "sandbox": {
+    "enabled": true,
+    "network": {
+      "strictAllowlist": true
+    },
+    "filesystem": {
+      "denyWrite": [
+        "**/.claude/settings.json",
+        "**/.claude/settings.local.json",
+        "**/.claude/stack-config.json",
+        "~/.claude/settings.json",
+        "~/.claude/stack-defaults.json",
+        "~/.claude/hooks/**",
+        "~/.claude/scripts/**",
+        "~/.claude/config/**",
+        "~/.claude/agents/**",
+        "~/.claude/skills/**",
+        "~/.claude/lib/**"
+      ]
+    },
+    "excludedCommands": [
+      "bash ~/.claude/scripts/permissions-compile.sh *",
+      "~/.claude/scripts/permissions-compile.sh *",
+      "python3 ~/.claude/skills/native-settings-edit/native_settings_edit.py *"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "tier": 5,
+  "name": "Local + Offline",
+  "description": "Ollama integration for sensitive data and offline capability. Bolt-on; hardware-dependent.",
+  "extends": "tier-4",
+  "files": {
+    "global": [
+      { "from": "agents/local-ops.md", "to": "~/.claude/agents/local-ops.md" }
+    ]
+  },
+  "requirements": [
+    { "type": "command", "name": "ollama" }
+  ],
+  "post_install_actions": [
+    "Start Ollama: brew services start ollama",
+    "Pull models per docs/HARDWARE.md sizing for your machine",
+    "Test: ollama run llama3.2:3b 'hello'"
+  ],
+  "smoke_tests": [
+    "test -f ~/.claude/agents/local-ops.md",
+    "command -v ollama",
+    "ollama list | grep -q 'llama'"
+  ]
+}

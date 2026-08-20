@@ -1,0 +1,16 @@
+{
+  "portfolios": {
+    "carbonet": {
+      "pace": "balanced",
+      "checkout_root": "~/Antigravity",
+      "members": [
+        "CarboNet-Nano/carbonet-provisioner",
+        "CarboNet-Nano/carbonet-app-template",
+        "CarboNet-Nano/AP-Approval-Flow",
+        "CarboNet-Nano/01-COGS-Project",
+        "CarboNet-Nano/carbonet-dashboards",
+        "get-lade/claude-code-stack"
+      ]
+    }
+  }
+}

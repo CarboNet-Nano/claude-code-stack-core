@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "aliases": {
+    "hi": { "target": "goodmorning" },
+    "hello": { "target": "goodmorning" },
+    "bye": { "target": "carbonight" },
+    "goodbye": { "target": "carbonight" },
+    "docs": { "target": "handbook" },
+    "carbonet": {
+      "target": "goodmorning",
+      "mode": "plain",
+      "help": "row",
+      "tools": "Bash, Read",
+      "description": "Check that everything is ready before you start working — that you're signed in, that your access is granted, that the stack is up to date, and that this folder is set up. Prints a plain-English ✅/❌ list with a fix for anything that's wrong, plus what changed since you were last here and a suggested first move, and never shows a key or password. Use at the start of a session, when something stops working, or when you're not sure whether your setup is right."
+    }
+  }
+}

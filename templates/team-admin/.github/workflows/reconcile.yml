@@ -1,0 +1,39 @@
+name: Claude Stack reconcile
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # hourly
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List intended changes without opening PRs"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read            # for checkout only; repo writes use STACK_RECONCILE_TOKEN
+
+concurrency:
+  group: claude-stack-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconcile org repos
+        env:
+          # PAT (not the default GITHUB_TOKEN, which is scoped to this repo only):
+          # Contents: write + Pull requests: write across in-scope repos.
+          GH_TOKEN: ${{ secrets.STACK_RECONCILE_TOKEN }}
+          # Scheduled runs go live (the config `enabled` gate still guards);
+          # manual runs default to dry-run for safety.
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+        run: bash scripts/reconcile.sh
+
+      - name: Reconcile tenant pack updates (Job B)
+        env:
+          GH_TOKEN: ${{ secrets.STACK_RECONCILE_TOKEN }}
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+        run: bash scripts/reconcile-packs.sh

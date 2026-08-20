@@ -1,0 +1,9 @@
+{
+  "name": "@stack/handbook",
+  "private": true,
+  "type": "module",
+  "description": "Handbook + deck generator (ADR-081). Maintainer-only; ships in no tier manifest.",
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  }
+}

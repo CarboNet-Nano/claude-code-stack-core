@@ -1,0 +1,282 @@
+{
+  "adhd": {
+    "group": "personal",
+    "touches": "Spawns N isolated ideation subagents (token spend), writes nothing outside scratch; scores and prunes branches"
+  },
+  "adr": {
+    "group": "dev workflow",
+    "touches": "Writes docs/ADRs/<NNN>-<slug>.md; reads the decision context only"
+  },
+  "agent-performance-review": {
+    "group": "dev workflow",
+    "touches": "Reads subagent_runs table; proposes (never applies) prompt/model changes"
+  },
+  "agent-teams": {
+    "group": "dev workflow",
+    "touches": "Edits .claude/settings.json env flag and stack-config.json orchestration_mode"
+  },
+  "alias": {
+    "group": "session lifecycle",
+    "touches": "Read-only: lists the short names configured on this machine and explains where each came from; changes nothing"
+  },
+  "auto-merge": {
+    "group": "safety gates",
+    "touches": "Writes GitHub repo settings, rulesets, and a CI workflow via gh; gates merges on run-tests"
+  },
+  "brainstorming": {
+    "group": "dev workflow",
+    "touches": "Text-only conversation; reads context, writes nothing, spawns nothing"
+  },
+  "carbonet": {
+    "group": "session lifecycle",
+    "touches": "Read-only environment/auth/stack checks; prints fixes, never shows secrets"
+  },
+  "carbonight": {
+    "group": "session lifecycle",
+    "touches": "Reads session diff, runs touched tests; commits only the lesson note and handoff file"
+  },
+  "claude-api": {
+    "group": "dev workflow",
+    "touches": "Read-only reference for Claude API models, pricing, and params; writes nothing"
+  },
+  "claude-automation-recommender": {
+    "group": "dev workflow",
+    "touches": "Reads the codebase; recommends hooks/subagents/skills, applies nothing"
+  },
+  "cloud-setup": {
+    "group": "session lifecycle",
+    "touches": "Prints a setup one-liner and click-steps; reads and writes nothing"
+  },
+  "config": {
+    "group": "dev workflow",
+    "touches": "Forwarding stub to /stack-config; touches nothing"
+  },
+  "cost-cap": {
+    "group": "safety gates",
+    "touches": "Writes session/day/hard-cap cost limits to stack config"
+  },
+  "cost-gate": {
+    "group": "safety gates",
+    "touches": "Runs a 10-row LLM sample (small spend), writes .claude/cost-projections/, blocks bulk jobs pending approval"
+  },
+  "coverage-snapshot": {
+    "group": "safety gates",
+    "touches": "Reads field-coverage counts before/after a bulk data run; fails loudly on regression"
+  },
+  "default-edit": {
+    "group": "dev workflow",
+    "touches": "Edits ~/.claude/stack-defaults.json or project stack-config.json with per-change confirmation"
+  },
+  "default-settings": {
+    "group": "dev workflow",
+    "touches": "Read-only view of global defaults, project config, and env overrides"
+  },
+  "deploy-edge": {
+    "group": "safety gates",
+    "touches": "Deploys a Supabase edge function with branch check, cost-log, ops checks, and smoke test"
+  },
+  "design-match": {
+    "group": "dev workflow",
+    "touches": "Reads design prototype and screenshots, edits UI code, diffs after"
+  },
+  "dispatch": {
+    "group": "dev workflow",
+    "touches": "Spawns a named subagent team, overriding foreman routing (token spend)"
+  },
+  "domain-mode": {
+    "group": "safety gates",
+    "touches": "Writes domain_mode(s) and paths to stack-config.json; enables extra review/gate rules"
+  },
+  "effort-eval": {
+    "group": "metered tools",
+    "touches": "METERED — runs golden tasks at multiple effort tiers plus cross-family judging; requires cost projection and approval"
+  },
+  "env-doctor": {
+    "group": "session lifecycle",
+    "touches": "Read-only checks of toolchain, env vars, creds presence, network, and project setup"
+  },
+  "eval-bump": {
+    "group": "metered tools",
+    "touches": "Runs eval suites and A/B comparisons (LLM spend); PRs golden-set patches only on strict improvement"
+  },
+  "foreman": {
+    "group": "dev workflow",
+    "touches": "Reads stack-config.json, classifies tasks, routes subagent teams, surfaces approval gates"
+  },
+  "git-safety-net": {
+    "group": "dev workflow",
+    "touches": "Reads local git state (reflog, stashes, worktrees, clones); preserves/recovers work before any cleanup"
+  },
+  "goodmorning": {
+    "group": "session lifecycle",
+    "touches": "Reads handoff, git state, CLAUDE.md, stack-config, PRs/CI; prints summary, starts no work"
+  },
+  "graphify-extract": {
+    "group": "metered tools",
+    "touches": "METERED — sends the corpus to a hosted LLM backend; writes graph output and .claude/graphify/receipt.json after hard-stop approval"
+  },
+  "graphify-init": {
+    "group": "dev workflow",
+    "touches": "Creates the pinned shared venv and .gitignore entries; spends nothing, sends nothing off-machine"
+  },
+  "grill-me": {
+    "group": "personal",
+    "touches": "Text-only Socratic interrogation of a written plan; reads the plan, writes nothing"
+  },
+  "grilling": {
+    "group": "personal",
+    "touches": "Asks the user one multiple-choice question at a time; reads and writes nothing"
+  },
+  "handbook": {
+    "group": "dev workflow",
+    "touches": "reads docs/handbook; build mode regenerates generated pages and the deck"
+  },
+  "handoff": {
+    "group": "session lifecycle",
+    "touches": "Pointer stub to /carbonight; touches nothing itself"
+  },
+  "loop-engineer": {
+    "group": "safety gates",
+    "touches": "Validates a loop spec against loop_policy ceiling, writes loop-state for Stop-hook cap enforcement"
+  },
+  "loop-level": {
+    "group": "safety gates",
+    "touches": "Writes loop_policy and cost_protection presets (L1-L4) into stack-config.json"
+  },
+  "loop-review": {
+    "group": "dev workflow",
+    "touches": "Reads loop-runs.jsonl and Supabase loop_runs view; print-only cap proposals"
+  },
+  "mcp-cli": {
+    "group": "dev workflow",
+    "touches": "Enumerates configured MCP servers and loads only needed tools; read-only discovery"
+  },
+  "model-audit": {
+    "group": "dev workflow",
+    "touches": "Pulls live benchmark/pricing data, compares to model-routing.json; outputs a diff, never auto-applies"
+  },
+  "model-eval": {
+    "group": "metered tools",
+    "touches": "METERED — runs golden tasks across models/efforts with blind cross-family judging; cost projection required"
+  },
+  "native-settings-edit": {
+    "group": "safety gates",
+    "touches": "Sole writer of native settings.json — one allowlisted scalar leaf per call, atomic, deny-by-default"
+  },
+  "new-migration": {
+    "group": "safety gates",
+    "touches": "Writes the next forward-only migration file with RLS checklist; routes the pre-schema-change gate, never applies"
+  },
+  "operating": {
+    "group": "session lifecycle",
+    "touches": "Read-only operating guide — commands, automatic behaviors, tier/domain table, doc locations"
+  },
+  "plan": {
+    "group": "dev workflow",
+    "touches": "Writes a plan to .claude/plans/; blocks implementation until explicit approval"
+  },
+  "pr-comments": {
+    "group": "dev workflow",
+    "touches": "Reads reviewer/security reports, posts inline GitHub PR review comments via gh api; idempotent"
+  },
+  "project-init": {
+    "group": "session lifecycle",
+    "touches": "Generates .claude/stack-config.json, scaffolds .claude/CLAUDE.md and docs/ directories"
+  },
+  "publish": {
+    "group": "safety gates",
+    "touches": "Deploys to Cloudflare, binding Secrets Store secrets into wrangler.toml; hard-aborts on missing secret"
+  },
+  "recommend-capabilities": {
+    "group": "dev workflow",
+    "touches": "Reads config/capability-registry.json and session context; ranks capabilities, writes nothing (internal only)"
+  },
+  "reflect": {
+    "group": "session lifecycle",
+    "touches": "Post-task retrospective — reads what was planned vs. shipped; captures lessons"
+  },
+  "review-handoff": {
+    "group": "safety gates",
+    "touches": "Reads all deliverable artifacts, runs consistency/gap review; blocks done-declaration until approve or revise"
+  },
+  "runbook": {
+    "group": "dev workflow",
+    "touches": "Writes docs/runbooks/<slug>.md operational runbooks"
+  },
+  "sensitivity": {
+    "group": "safety gates",
+    "touches": "Writes the project's data-sensitivity level to stack config; downgrades are safety-relevant"
+  },
+  "session": {
+    "group": "personal",
+    "touches": "Writes communication/effort/orchestration prefs to the session-state file; optionally saves as defaults"
+  },
+  "stack-config": {
+    "group": "dev workflow",
+    "touches": "Read-first settings dashboard; single-setting writes routed through native-settings-edit only"
+  },
+  "stack-help": {
+    "group": "session lifecycle",
+    "touches": "reads the capability registry and help groups; prints only"
+  },
+  "strict-mode": {
+    "group": "safety gates",
+    "touches": "Toggles foreman strict mode in project config; turning off prompts for reason"
+  },
+  "suggest": {
+    "group": "dev workflow",
+    "touches": "Reads thread context, calls recommend-capabilities, renders 3-5 suggestions; writes nothing"
+  },
+  "sweep": {
+    "group": "session lifecycle",
+    "touches": "Runs sweep scripts and renders the report; reports only, fixes nothing"
+  },
+  "team-init": {
+    "group": "session lifecycle",
+    "touches": "Creates an org admin repo from templates with reconciler Action; prints token-secret steps"
+  },
+  "team-status": {
+    "group": "session lifecycle",
+    "touches": "Reads ~/.claude/logs/subagent-runs.jsonl; shows agent usage, optional replan proposal"
+  },
+  "tier": {
+    "group": "safety gates",
+    "touches": "Writes the project tier (0-5), triggering capability install/removal; always safety-relevant"
+  },
+  "todo": {
+    "group": "session lifecycle",
+    "touches": "Read-only view of improvement-queue top items and handoff next steps"
+  },
+  "ultracode": {
+    "group": "safety gates",
+    "touches": "Session-only env/state flag raising the loop autonomy ceiling one level; not persisted"
+  },
+  "user-docs": {
+    "group": "dev workflow",
+    "touches": "Drives the browser via MCP, dispatches user-docs-writer, writes screenshot-backed guides in docs/user/"
+  },
+  "user-docs-logic": {
+    "group": "dev workflow",
+    "touches": "Executes real entry points under an adversarial parity gate; writes docs/user/logic/<unit>.md plus receipts"
+  },
+  "user-docs-refresh": {
+    "group": "dev workflow",
+    "touches": "Replays Playwright docs-tests against the live app, classifies staleness, updates step text via writer"
+  },
+  "using-superpowers": {
+    "group": "dev workflow",
+    "touches": "Read-only discipline guide routing brainstorming to /plan to code; writes nothing"
+  },
+  "validate-output": {
+    "group": "safety gates",
+    "touches": "Runs implemented code with representative inputs, asserts exact expected values; required for financial-code mode"
+  },
+  "value-check": {
+    "group": "dev workflow",
+    "touches": "Runs the deterministic value-check-gate scorer (no LLM), renders docs/value/ROLLUP.md"
+  },
+  "walkthrough": {
+    "group": "session lifecycle",
+    "touches": "Asks the user per-surface checklist questions; writes finding-records via sweep_emit_finding only"
+  }
+}

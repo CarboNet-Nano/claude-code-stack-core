@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/live-capability-snapshot.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/loop-stop.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/model-fit-turn.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/dispatch-nudge.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/loop-shape-nudge.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/advisor-pair-nudge.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/bulk-job-reminder.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/irreversible-deny.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/loop-cost-monitor.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/schema-deploy-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*__(apply_migration|execute_sql|deploy_edge_function)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/schema-deploy-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/subagent-log.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/override-log.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/loop-cost-monitor.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/bare-agent-nudge.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/usage-check-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/usage-check-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/workflow-roster-check.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/loop-cost-monitor.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/design-gate.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/migration-guard.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/handoff-guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/usage-check-token.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/subagent-complete-log.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Agent|Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/loop-cost-accrual.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/guard-check.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "neon@claude-plugins-official": true,
+    "cloudflare@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "remember@claude-plugins-official": true,
+    "project-artifact@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true
+  }
+}

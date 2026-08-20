@@ -1,0 +1,38 @@
+# <Project name>
+
+<One-paragraph description: what this project is, who uses it, what it produces.>
+
+## Quick start
+
+```bash
+# Install
+<install commands>
+
+# Run locally
+<command>
+```
+
+## Stack tier
+
+This project is configured at **Tier <N>**. See `.claude/stack-config.json` for active subagents and overrides.
+
+## Architecture
+
+See `docs/ARCHITECTURE.md`.
+
+## Key documents
+
+- `CLAUDE.md` — agent guidance
+- `docs/ARCHITECTURE.md` — system architecture
+- `docs/ONBOARDING.md` — for human successors
+- `docs/ADRs/` — architectural decisions
+- `docs/runbooks/` — operational runbooks
+- `docs/handoffs/` — session continuity
+
+## Repo family
+
+<If part of a family, link related repos.>
+
+## License
+
+<License if any.>

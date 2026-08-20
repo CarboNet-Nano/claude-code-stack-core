@@ -1,0 +1,73 @@
+{
+  "tier": 3,
+  "name": "Specialist Bench",
+  "description": "6 specialist subagents + domain modes. For complex multi-domain work. Adversarial roles (architecture-critic, red-team) reach the Gemini family via the REST API (`scripts/lib/gemini-api.sh`) — the CLI is retired; see ADR-027 and ADR-031.",
+  "extends": "tier-2",
+  "files": {
+    "global": [
+      { "from": "skills/user-docs/SKILL.md", "to": "~/.claude/skills/user-docs/SKILL.md" },
+      { "from": "skills/user-docs-refresh/SKILL.md", "to": "~/.claude/skills/user-docs-refresh/SKILL.md" },
+      { "from": "skills/user-docs-logic/SKILL.md", "to": "~/.claude/skills/user-docs-logic/SKILL.md" },
+      { "from": "tools/user-docs/package.json", "to": "~/.claude/tools/user-docs/package.json" },
+      { "from": "tools/user-docs/playwright.config.ts", "to": "~/.claude/tools/user-docs/playwright.config.ts" },
+      { "from": "tools/user-docs/src/index.ts", "to": "~/.claude/tools/user-docs/src/index.ts" },
+      { "from": "tools/user-docs/src/logic-evidence.mjs", "to": "~/.claude/tools/user-docs/src/logic-evidence.mjs", "executable": true },
+      { "from": "tools/user-docs/src/check-harness-target.mjs", "to": "~/.claude/tools/user-docs/src/check-harness-target.mjs", "executable": true },
+      { "from": "tools/user-docs/bin.ts", "to": "~/.claude/tools/user-docs/bin.ts", "executable": true },
+      { "from": "tools/user-docs/tsconfig.json", "to": "~/.claude/tools/user-docs/tsconfig.json" },
+      { "from": "scripts/logic-parity-gate.sh", "to": "~/.claude/scripts/logic-parity-gate.sh", "executable": true },
+      { "from": "scripts/logic-receipt.sh", "to": "~/.claude/scripts/logic-receipt.sh", "executable": true },
+      { "from": "scripts/logic-stale-check.sh", "to": "~/.claude/scripts/logic-stale-check.sh", "executable": true },
+      { "from": "scripts/logic-exec-recheck.sh", "to": "~/.claude/scripts/logic-exec-recheck.sh", "executable": true },
+      { "from": "config/domain-modes.json", "to": "~/.claude/config/domain-modes.json" },
+      { "from": "skills/value-check/SKILL.md", "to": "~/.claude/skills/value-check/SKILL.md" },
+      { "from": "tools/value-check/src/score.mjs", "to": "~/.claude/tools/value-check/src/score.mjs", "executable": true },
+      { "from": "tools/value-check/prompts/claim-review.md", "to": "~/.claude/tools/value-check/prompts/claim-review.md" },
+      { "from": "scripts/value-check-gate.sh", "to": "~/.claude/scripts/value-check-gate.sh", "executable": true },
+      { "from": "skills/graphify-init/SKILL.md",    "to": "~/.claude/skills/graphify-init/SKILL.md" },
+      { "from": "skills/graphify-extract/SKILL.md", "to": "~/.claude/skills/graphify-extract/SKILL.md" },
+      { "from": "tools/graphify/requirements.txt",  "to": "~/.claude/tools/graphify/requirements.txt" }
+    ],
+    "schemas": [
+      { "from": "schemas/004-loop-runs.sql", "apply_to_db": true }
+    ]
+  },
+  "requirements": [
+    { "type": "command", "name": "codex", "advisory": true }
+  ],
+  "smoke_tests": [
+    "test -f ~/.claude/skills/user-docs/SKILL.md",
+    "test -f ~/.claude/skills/user-docs-refresh/SKILL.md",
+    "test -f ~/.claude/skills/user-docs-logic/SKILL.md",
+    "test -f ~/.claude/tools/user-docs/package.json",
+    "test -f ~/.claude/tools/user-docs/tsconfig.json",
+    "test -x ~/.claude/tools/user-docs/bin.ts",
+    "test -x ~/.claude/tools/user-docs/src/logic-evidence.mjs",
+    "test -x ~/.claude/tools/user-docs/src/check-harness-target.mjs",
+    "test -x ~/.claude/scripts/logic-parity-gate.sh",
+    "test -x ~/.claude/scripts/logic-receipt.sh",
+    "test -x ~/.claude/scripts/logic-stale-check.sh",
+    "test -x ~/.claude/scripts/logic-exec-recheck.sh",
+    "test -f ~/.claude/config/domain-modes.json",
+    "test -f ~/.claude/skills/value-check/SKILL.md",
+    "test -x ~/.claude/tools/value-check/src/score.mjs",
+    "test -f ~/.claude/tools/value-check/prompts/claim-review.md",
+    "test -x ~/.claude/scripts/value-check-gate.sh",
+    "test -f ~/.claude/skills/graphify-init/SKILL.md",
+    "test -f ~/.claude/skills/graphify-extract/SKILL.md",
+    "test -f ~/.claude/tools/graphify/requirements.txt"
+  ],
+  "advisory_smoke_tests": [
+    "[ -n \"${GEMINI_API_KEY:-}\" ] || security find-generic-password -s gemini-api-key -w",
+    "command -v codex"
+  ],
+  "notes": {
+    "gemini_requirement": "Gemini-family work routes through the REST API, NOT a CLI: ADR-027 retired the Gemini CLI (IneligibleTierError — the CLI is dead) and moved these roles to `scripts/lib/gemini-api.sh`, keyed on `GEMINI_API_KEY` (env) or macOS Keychain `gemini-api-key`. Per ADR-031 the Gemini dependency is a soft key check in `advisory_smoke_tests` ([ -n $GEMINI_API_KEY ] || Keychain `gemini-api-key`), NOT a hard `command: gemini` requirement (that binary can no longer authenticate). It is not a hard `requirements[]` entry: ADR-030's advisory-requirement mechanism is command-only, and a hard `keychain_item` would abort a fresh install — the advisory smoke test (run by verify.sh at install step 5) carries the warning instead.",
+    "domain_modes_path": "domain-modes.json installs to ~/.claude/config/domain-modes.json (the /domain-mode skill reads it from there). Artifact 4's manifest said ~/.claude/domain-modes.json — corrected for consistency with the skill and the other config files.",
+    "prompt_caching": "config/prompt-caching.json is installed at Tier 2 (tier-3 extends tier-2); not re-listed here.",
+    "user_docs_runner": "ADR-045: tools/user-docs/ is the first repo-sourced entry under a new top-level tools/ directory. tier-installer.sh is copy-only, so node_modules and Playwright browser binaries are NOT installed here — the /user-docs skill preflight lazily runs `npm install` + `npx playwright install chromium` in ~/.claude/tools/user-docs/ on first use. Smoke tests therefore assert file presence only. Do not add a hard `command: npm` requirement: a Tier-3 install must not fail on a machine that never dispatches user-docs-writer.",
+    "logic_extraction_scripts": "ADR-050: scripts/logic-parity-gate.sh resolves scripts/lib/gemini-api.sh relative to its own directory ($DIR/lib/gemini-api.sh). In the installed layout that resolves to ~/.claude/scripts/lib/gemini-api.sh, which tier-2 already manifests (tier-3 extends tier-2) — no additional manifest entry is needed for it here. logic-receipt.sh, logic-stale-check.sh, and logic-exec-recheck.sh are zero-LLM-token (pure git/python3/jq) and never source gemini-api.sh; only logic-parity-gate.sh (unchanged Phase 5a script) needs the Gemini key. No hard `requirements[]` entry is added for the same reason as user_docs_runner: a Tier-3 install must not fail on a machine that never runs a logic extraction.",
+    "value_check": "docs/proposals/2026-07-30-business-value-real-build-v2.md, Phase 1. scripts/value-check-gate.sh resolves scripts/lib/openai-review.sh and scripts/lib/gemini-api.sh relative to its own directory, both already manifested at tier-2 (tier-3 extends tier-2) — no additional manifest entry needed for them. D11 (amended §10.1) requires BOTH an OpenAI key and a Gemini key to resolve before `ratify` can write a pin; `score`/`dispose`/`revise`/`render`/`bounds`/`report` need neither. No hard `requirements[]` entry for either key, same reasoning as gemini_requirement above — a Tier-3 install must not fail on a machine that never ratifies a value claim. tools/value-check/fixtures/** (example claim, probe, and the fake-psql test shim) are intentionally NOT manifested here — they are stack-repo-only test fixtures, not runtime tooling, exactly as tests/ and tools/user-docs/.run/ are not manifested either. D18: the target repo's OWN `.claude/stack-config.json` needs a `value` block and a provisioned read-only DB role before `score` can run a probe — value-check-gate.sh fails hard with the exact provisioning command when either is missing; this is a per-target-repo precondition, not a stack-install concern.",
+    "graphify": "ADR-054: skills/graphify-init/SKILL.md and skills/graphify-extract/SKILL.md are copy-only, same shape as user_docs_runner and logic_extraction_scripts — no hard `requirements[]` entry for python3/pip/venv, since a Tier-3 install must not fail on a machine that never runs graphify. The pinned shared venv (graphifyy[gemini,sql]==0.9.32) at ~/.claude/tools/graphify/.venv is created lazily by /graphify-init's own preflight on first use, never shipped by the installer. The backend key is covered by this manifest's existing GEMINI_API_KEY advisory_smoke_test above — no new entry needed. D4's V1 (does `graphify extract --code-only`'s report count include non-code files, or only parsed code files?) and V2 (does the discovery walk honour .gitignore?) are REQUIRED one-time empirical verifications before the metered full-extraction path may be trusted in any environment, per ADR-054 D4. **RUN 2026-08-01** against this repo (claude-code-stack, doc-heavy anchor) using graphifyy 0.9.32 in the pinned venv at ~/.claude/tools/graphify/.venv, `graphify extract . --code-only --no-cluster`. Verbatim stdout: `[graphify extract] --code-only: skipping 359 non-code file(s) (359 docs, 0 papers, 0 images) — no LLM extraction` then `[graphify extract] found 165 code, 0 docs, 0 papers, 0 images` (12 more files unclassified/skipped), then `wrote .../graph.json — 2360 nodes, 3031 edges`. **V1 result: the report counts ONLY parsed code files (165), not the full file-discovery-walk total (524) — it reports code and non-code counts as two separate numbers, never conflated.** This is the second branch in D4's V1 decision rule: step 4's projection basis falls back to the step-3a ECS enumeration (`git ls-files -z --cached --others --exclude-standard`) rather than this report's own code count, and D5's calibration-band label must note the denominator is a git inventory, not graphify's own report. **V2 result: CONFIRMED — the discovery walk honours .gitignore.** A canary file (`tools/graphify/__pycache__/canary_module.py`, real Python class+function content, sitting inside a directory matched by this repo's own `__pycache__/` gitignore rule, confirmed ignored via `git check-ignore -v`) was placed before the run and searched for after: zero occurrences of `canary` or `__pycache__` in either `manifest.json` (165 entries, exactly the parsed-code count, no canary) or `graph.json` (2360 nodes, 3031 edges, grep for both strings returns 0 hits). The walk never reached the canary. This proves `dispatch ⊆ ECS` holds for this graphify version/config, so D6's egress heuristic is sound and step 3a stands as written — the metered full-extraction path in `/graphify-extract` is CLEARED to run against real repos, D4's precondition satisfied. Canary file and temp output directory were deleted after the run; nothing from this verification is tracked in git. This --code-only run performed no LLM dispatch (per `graphify --help`: \"index code (local AST, no API key)\"), so no cost/tokens were incurred and no `calibration.jsonl` entry applies — V1/V2 are structural verifications, not calibration runs."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@stack/invariants",
+  "private": true,
+  "type": "module",
+  "description": "Production-data invariants MVP (ADR-082 P1f) — parses docs/invariants/*.sql, executes each through a database-enforced read-only Postgres connection behind a blocking write-probe, appends verdict-only rows to a JSONL ledger.",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "pg": "8.23.0"
+  }
+}

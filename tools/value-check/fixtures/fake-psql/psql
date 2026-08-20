@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Fake `psql` — stands in for a real Postgres connection so
+# scripts/value-check-gate.sh's probe-execution path (D18's execution shape:
+# `psql "$URL" -t -A -q --no-psqlrc -v ON_ERROR_STOP=1 -f <probe>`) can be
+# exercised without entry gates 1-3 met (no real read-only role provisioned
+# yet — see the Phase 1 implementer report). Never used outside a test PATH
+# override; the real gate always calls the real `psql` binary.
+#
+# Mode selected via $FAKE_PSQL_MODE (a test-only knob, not a credential — the
+# real DB URL argv/env-only question is unaffected by this file). Values
+# below are hand-matched to
+# tools/value-check/fixtures/repo/docs/value/claims/md-daily-march-autosettle-v1.json
+# (target 50, minN 4, maxStalenessDays 3) so each mode drives one exit test.
+set -uo pipefail
+MODE="${FAKE_PSQL_MODE:-normal}"
+
+# TODAY: modes whose whole point is "fresh" (everything except `stale`, whose
+# whole point is "backdated past maxStalenessDays") stamp VALUE-FRESHNESS with
+# today's real date rather than a hardcoded one. A hardcoded date silently
+# expired past claim.freshness.maxStalenessDays (3 days) a few days after this
+# fixture was written -- caught by tests/test-value-check.sh going red on a
+# pure calendar tick with no code change, 2026-07-31. `window.to` stays
+# pinned in the past (score.mjs's validateProbeOutput never cross-checks it
+# against freshness.asOf, so it never expires).
+TODAY="$(date -u +%Y-%m-%d)"
+
+case "$MODE" in
+  normal)
+    # exit tests 1, 15, 16: n=5>=4, value=63>=target 50 -> PASS.
+    cat <<EOF
+VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":63,"n":5,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"$TODAY"}
+EOF
+    ;;
+  miss)
+    # exit test 14: value=10 < target 50 -> MISS.
+    cat <<EOF
+VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":10,"n":5,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"$TODAY"}
+EOF
+    ;;
+  insufficient-n)
+    # exit test 8: n=2 < minN 4 -> INSUFFICIENT-DATA.
+    cat <<EOF
+VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":63,"n":2,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"$TODAY"}
+EOF
+    ;;
+  stale)
+    # exit test 9: asOf far in the past -> ageDays > maxStalenessDays -> STALE-SOURCE.
+    cat <<'EOF'
+VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":63,"n":5,"unit":"writes","window":{"from":"2026-06-01","to":"2026-06-10"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"2026-06-10"}
+EOF
+    ;;
+  no-freshness)
+    # exit test 10: VALUE-FRESHNESS stripped -> PROBE-BROKEN (not PROBE-OUTPUT-REJECTED).
+    echo 'VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":63,"n":5,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}'
+    ;;
+  nonzero-exit)
+    echo "fake-psql: synthetic failure" >&2
+    exit 1
+    ;;
+  env-dump)
+    # SEC06 (HIGH 3 percent-decoding regression test): dumps the exact
+    # PG* env values this process actually received, to stderr --
+    # value-check-gate.sh's cmd_score surfaces raw probe stderr verbatim to
+    # the console (never recorded to the ledger) -- so a test can assert
+    # PGUSER/PGPASSWORD/PGDATABASE were percent-decoded by
+    # parse_db_url_to_pg_env before reaching this process, without ever
+    # printing a real credential.
+    echo "fake-psql-env-dump PGUSER=${PGUSER:-<unset>} PGPASSWORD=${PGPASSWORD:-<unset>} PGDATABASE=${PGDATABASE:-<unset>}" >&2
+    cat <<EOF
+VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":63,"n":5,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"$TODAY"}
+EOF
+    ;;
+  pii-leak)
+    # exit test 6 (first half): metric field mismatches claim.metric.name (a
+    # PII-shaped string) -> PROBE-OUTPUT-REJECTED, and the string never
+    # reaches the ledger because the whole line is rejected, not partially
+    # recorded.
+    cat <<'EOF'
+VALUE-OBSERVATION {"metric":"customer_email_x@y.com","value":63,"n":5,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"2026-07-29"}
+EOF
+    ;;
+  extra-injection)
+    # exit test 6 (second half): a markdown-link line beyond the two
+    # contract lines -> discarded by score.mjs, never rendered. Reaches
+    # PASS (rule 12), so asOf must stay fresh -- see the TODAY note above.
+    cat <<EOF
+VALUE-OBSERVATION {"metric":"auto_settled_writes_since_launch","value":63,"n":5,"unit":"writes","window":{"from":"2026-06-25","to":"2026-07-29"}}
+VALUE-FRESHNESS {"source":"daily_march_ledger","asOf":"$TODAY"}
+some noise [click](http://evil.example/steal)
+EOF
+    ;;
+  *)
+    echo "fake-psql: unknown FAKE_PSQL_MODE '$MODE'" >&2
+    exit 2
+    ;;
+esac

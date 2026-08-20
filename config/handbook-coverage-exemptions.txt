@@ -1,0 +1,26 @@
+# Handbook coverage exemptions — one entry per line: <path>  <reason>
+# Everything in tools/ and scripts/ must either be mentioned somewhere in
+# docs/handbook/ or carry an exemption here WITH a reason. An exemption
+# without a reason fails the check — silent opt-outs are the failure mode
+# this file exists to prevent (same doctrine as gate-vacuity).
+scripts/backup.sh  internal plumbing: operator backup helper, not a user-facing system
+scripts/check-docs-pipeline-phase5a.sh  internal plumbing: one-off phase gate for the docs pipeline build-out
+scripts/check-token-expiry.sh  internal plumbing: credential-expiry nag, no system of its own
+scripts/cloud-bootstrap.sh  covered conceptually by docs/CLOUD.md; setup shim, not a system
+scripts/eval-db-load.sh  internal plumbing: loads eval fixtures, part of model-eval tooling
+scripts/gen-capability-registry.sh  internal plumbing: build step for the capability registry
+scripts/gen-portable-core-manifest.sh  internal plumbing: build step for portable-core (system documented)
+scripts/logic-exec-recheck.sh  part of the user-docs pipeline (documented as a system)
+scripts/logic-parity-gate.sh  part of the user-docs pipeline (documented as a system)
+scripts/logic-receipt.sh  part of the user-docs pipeline (documented as a system)
+scripts/logic-stale-check.sh  part of the user-docs pipeline (documented as a system)
+scripts/mcp-sweep.sh  MCP-config cleanup sweep; operator tool, revisit if it grows
+scripts/mirror-sync.sh  internal plumbing: repo mirror sync helper
+scripts/org-check.sh  internal plumbing: org-membership preflight
+scripts/overnight-guard.sh  part of the overnight machinery (documented as a system)
+scripts/pack-lint.sh  internal plumbing: tenant-pack linter
+scripts/permissions-compile.sh  internal plumbing: build step for permission sets
+scripts/sandbox-policy-compile.sh  internal plumbing: build step for sandbox policy
+scripts/session-brief.sh  engine behind /goodmorning's banner lines (skill documented)
+scripts/audit-repos.sh  internal plumbing: fleet audit driver, operator-only
+tools/invariants  lands with testing-doctrine v2 (PR 248); write its machinery page once merged
