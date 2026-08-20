@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'C=\"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"; [ -f \"$C/hooks/stack-update.pin.json\" ] && exit 0; R=$(jq -r .source_repo \"$C/.stack-install.json\" 2>/dev/null); T=$(jq -r .tier \"$C/.stack-install.json\" 2>/dev/null); [ -d \"$R\" ] || exit 0; cd \"$R\" && git checkout -q main && git pull -q && STACK_UPDATE_VIA_HOOK=1 ./scripts/update.sh --tier=\"$T\" >/dev/null 2>&1; exit 0'",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  }
+}
