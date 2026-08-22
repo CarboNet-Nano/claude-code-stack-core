@@ -1,0 +1,7 @@
+{
+  "schema": "stack-fleet-roster/v1",
+  "config_dirs": [
+    { "label": "master", "path": "~/.claude" },
+    { "label": "lade", "path": "~/.claude-lade" }
+  ]
+}

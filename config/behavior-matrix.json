@@ -1,0 +1,1916 @@
+{
+  "schema_version": 1,
+  "dials": [
+    "assertiveness",
+    "autonomy"
+  ],
+  "ladder": [
+    "observe",
+    "recommend",
+    "decide-with-review",
+    "decide",
+    "gate"
+  ],
+  "domain_modes": [
+    "financial-code",
+    "schema-migration",
+    "ui-design",
+    "deploy",
+    "default"
+  ],
+  "sensitivity_levels": [
+    "normal",
+    "sensitive",
+    "confidential"
+  ],
+  "generation_rule": "Mechanical, tier-based defaults (REQ-120/121; quality of individual rows is a plan-review concern, not a test assertion). Each agent is assigned a tool-footprint tier from its agents/*.md frontmatter: 'author' (no Bash — accessibility-auditor, architect, designer, documenter, integration-specialist) starts at {assertiveness: recommend, autonomy: decide}; 'exec' (declared Bash access) and 'full' (undeclared tools == all tools, including the anticipated pm row) both start at {assertiveness: recommend, autonomy: decide-with-review}. financial-code and schema-migration force assertiveness=gate and cap autonomy at decide-with-review, for every tier and every sensitivity level (REQ-120 acceptance: gated domains always gate). deploy caps autonomy at decide-with-review without forcing assertiveness. sensitivity=sensitive steps autonomy down one ladder rung and floors assertiveness at decide-with-review; sensitivity=confidential forces {assertiveness: gate, autonomy: observe} outright, regardless of tier or domain mode. `fallback` is the exec-tier cube, used by resolveMatrix when a requested agent has no row in any layer.",
+  "fallback": {
+    "financial-code": {
+      "normal": {
+        "assertiveness": "gate",
+        "autonomy": "decide-with-review"
+      },
+      "sensitive": {
+        "assertiveness": "gate",
+        "autonomy": "recommend"
+      },
+      "confidential": {
+        "assertiveness": "gate",
+        "autonomy": "observe"
+      }
+    },
+    "schema-migration": {
+      "normal": {
+        "assertiveness": "gate",
+        "autonomy": "decide-with-review"
+      },
+      "sensitive": {
+        "assertiveness": "gate",
+        "autonomy": "recommend"
+      },
+      "confidential": {
+        "assertiveness": "gate",
+        "autonomy": "observe"
+      }
+    },
+    "ui-design": {
+      "normal": {
+        "assertiveness": "recommend",
+        "autonomy": "decide-with-review"
+      },
+      "sensitive": {
+        "assertiveness": "decide-with-review",
+        "autonomy": "recommend"
+      },
+      "confidential": {
+        "assertiveness": "gate",
+        "autonomy": "observe"
+      }
+    },
+    "deploy": {
+      "normal": {
+        "assertiveness": "recommend",
+        "autonomy": "decide-with-review"
+      },
+      "sensitive": {
+        "assertiveness": "decide-with-review",
+        "autonomy": "recommend"
+      },
+      "confidential": {
+        "assertiveness": "gate",
+        "autonomy": "observe"
+      }
+    },
+    "default": {
+      "normal": {
+        "assertiveness": "recommend",
+        "autonomy": "decide-with-review"
+      },
+      "sensitive": {
+        "assertiveness": "decide-with-review",
+        "autonomy": "recommend"
+      },
+      "confidential": {
+        "assertiveness": "gate",
+        "autonomy": "observe"
+      }
+    }
+  },
+  "agents": {
+    "accessibility-auditor": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "architect": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "designer": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "documenter": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "integration-specialist": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "decide-with-review"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "architecture-critic": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "data-engineer": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "historian": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "implementer": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "librarian": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "performance-engineer": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "ops": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "product-critic": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "red-team": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "reviewer": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "scribe": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "security-auditor": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "tester": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "validator": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "estimator": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "foreman-team-lead": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "incident-commander": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "local-ops": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "user-docs-writer": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review"
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend"
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe"
+        }
+      }
+    },
+    "pm": {
+      "financial-code": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        }
+      },
+      "schema-migration": {
+        "normal": {
+          "assertiveness": "gate",
+          "autonomy": "decide-with-review",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "sensitive": {
+          "assertiveness": "gate",
+          "autonomy": "recommend",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        }
+      },
+      "ui-design": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        }
+      },
+      "deploy": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        }
+      },
+      "default": {
+        "normal": {
+          "assertiveness": "recommend",
+          "autonomy": "decide-with-review",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "sensitive": {
+          "assertiveness": "decide-with-review",
+          "autonomy": "recommend",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        },
+        "confidential": {
+          "assertiveness": "gate",
+          "autonomy": "observe",
+          "execution": { "tier": "opus", "effort": "high", "advisor": null, "fanout": 1 }
+        }
+      }
+    }
+  }
+}

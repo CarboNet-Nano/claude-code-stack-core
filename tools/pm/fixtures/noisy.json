@@ -1,0 +1,51 @@
+{
+  "tracks": [
+    {
+      "track": "idle-project",
+      "goal": "Design new component library",
+      "updated": "2026-07-29",
+      "blocked_on": "",
+      "prioritized": true
+    },
+    {
+      "track": "overridden-flow",
+      "goal": "Refactor authentication system",
+      "updated": "2026-08-05",
+      "blocked_on": "",
+      "prioritized": false
+    },
+    {
+      "track": "estimate-miss",
+      "goal": "Migrate database to new schema",
+      "updated": "2026-08-04",
+      "blocked_on": "waiting-approval",
+      "prioritized": true
+    }
+  ],
+  "counters": {
+    "staleCalls": 1,
+    "overridesByAgent": {
+      "pm": 4
+    },
+    "pendingPredictions": 2
+  },
+  "spend": [
+    {
+      "track": "estimate-miss",
+      "actual": 50,
+      "estimate": 20
+    }
+  ],
+  "suggestions": [
+    {
+      "author": "pm",
+      "subject": "pm",
+      "text": "This should be dropped"
+    },
+    {
+      "author": "panel",
+      "subject": "pm",
+      "text": "This panel suggestion should be kept in fence"
+    }
+  ]
+}

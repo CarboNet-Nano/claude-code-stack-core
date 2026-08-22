@@ -1,0 +1,47 @@
+{
+  "$schema": "../schemas/stack-defaults-schema.json",
+  "stack_version": "1.3.1",
+  "user_name": "<prompted-at-install>",
+  "user_email": "<prompted-at-install>",
+  "additional_directories": [],
+  "default_tier": 4,
+  "default_orchestration_mode": "main-thread",
+  "default_strict_mode": true,
+  "default_domain_mode": null,
+  "default_sensitivity_level": "normal",
+  "default_required_approvals": [],
+  "default_cost_protection": {
+    "per_session_alert_usd": 5.00,
+    "per_day_alert_usd": 50.00,
+    "per_session_hard_cap_usd": null
+  },
+  "supabase": {
+    "project_ref": "<prompted-at-install>",
+    "url": "<prompted-at-install>"
+  },
+  "providers": {
+    "anthropic_key_keychain_item": "anthropic-api-key",
+    "openai_key_keychain_item": "openai-api-key",
+    "google_ai_key_keychain_item": "google-ai-api-key"
+  },
+  "review_pass": {
+    "required_for_handoffs": true,
+    "required_for_specs": true,
+    "required_for_audit_reports": true,
+    "required_for_design_docs": true
+  },
+  "session_prefs_defaults": {
+    "communication_style": "balanced",
+    "model_effort": "balanced",
+    "explanation_verbosity": "normal",
+    "cost_alert_sensitivity": "normal",
+    "passive_suggest": true,
+    "simple_talk": "off",
+    "model_fit_receipt": "on",
+    "auto_offer_loop": true,
+    "auto_offer_advisor_pair": true
+  },
+  "guards": {
+    "usage_check_gate": "warn"
+  }
+}

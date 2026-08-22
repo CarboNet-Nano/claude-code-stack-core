@@ -1,0 +1,369 @@
+{
+  "version": "1.6.0",
+  "last_audited": "2026-08-20",
+  "next_audit_due": "2026-08-31",
+  "verification_note": "2026-08-04 targeted audit (triggered by a user-spotted OpenAI free-tier notice, not the scheduled monthly cycle): review_tiers.high moved gpt-5.5 -> gpt-5.6-terra (Terra beats gpt-5.5 on SWE-Bench Pro at 40% of flagship Sol's price; gpt-5.5's own live status was ambiguous across scraped sources and is now moot since nothing here still points at it). Confirmed via WebSearch only (no live API call) -- same doc-scrape caveat as prior cycles. Anthropic/Gemini/DeepSeek pricing reconfirmed unchanged. Full report: docs/model-audits/2026-08-04.md. Prior note (2026-07-31 full audit) preserved below for history: Model IDs and pricing checked 2026-07-31 (claude-opus-5, gpt-5.6-terra price cut, deepseek surcharge correction, grok-4.5 reconfirmed) via WebSearch/WebFetch against each provider's published pricing/model docs -- NOT a live GET /v1/models (or equivalent) API call; skills/model-audit/SKILL.md step 2 has no such call wired in. EXCEPTION: the Gemini model id WAS live-checked that cycle (see providers.gemini.notes) after a WebSearch GA claim proved false against a real API call -- that's the one field that audit trusted at live-endpoint level, everything else stayed doc-scrape-verified. /model-audit re-verifies monthly. Re-check before any cost-sensitive operation. Full report: docs/model-audits/2026-07-31.md.",
+  "providers": {
+    "anthropic": {
+      "api_key_keychain": "anthropic-api-key",
+      "base_url": "https://api.anthropic.com",
+      "models": {
+        "claude-opus-5": {
+          "api_model_id": "claude-opus-5",
+          "context_window": 1000000,
+          "max_output": 128000,
+          "supports_caching": true,
+          "pricing_per_million_input": 5.0,
+          "pricing_per_million_output": 25.0,
+          "pricing_note": "Renamed from claude-opus-4-8 on manual request (2026-07-27). VERIFIED live 2026-07-31 against platform.claude.com \u2014 price unchanged from placeholder, flag cleared.",
+          "pricing_verified_date": "2026-07-31"
+        },
+        "claude-sonnet-4-6": {
+          "api_model_id": "claude-sonnet-4-6",
+          "context_window": 1000000,
+          "max_output": 64000,
+          "supports_caching": true,
+          "pricing_per_million_input": 3.0,
+          "pricing_per_million_output": 15.0,
+          "pricing_verified_date": "2026-05-15"
+        },
+        "claude-haiku-4-5-20251001": {
+          "api_model_id": "claude-haiku-4-5-20251001",
+          "context_window": 200000,
+          "supports_caching": true,
+          "pricing_per_million_input": 1.0,
+          "pricing_per_million_output": 5.0,
+          "pricing_verified_date": "2026-05-15"
+        },
+        "claude-sonnet-5": {
+          "api_model_id": "claude-sonnet-5",
+          "context_window": 1000000,
+          "max_output": 64000,
+          "supports_caching": true,
+          "pricing_per_million_input": 2.0,
+          "pricing_per_million_output": 10.0,
+          "pricing_note": "$2/$10 made PERMANENT 2026-08-10 (the planned Sept 1 rise to $3/$15 is cancelled \u2014 2026-08-20 audit). New tokenizer produces ~30% more tokens for the same text vs Sonnet 4.6 \u2014 budget projections must use measured tokens.",
+          "pricing_verified_date": "2026-08-20"
+        },
+        "claude-fable-5": {
+          "api_model_id": "claude-fable-5",
+          "context_window": 1000000,
+          "supports_caching": true,
+          "pricing_per_million_input": 10.0,
+          "pricing_per_million_output": 50.0,
+          "pricing_note": "Cache hit $1/MTok, 5m cache write $12.50/MTok. New tokenizer (~30% more tokens). Escalation-only ceiling (sonnet -> opus -> fable -> human), never steady-state (~2x Opus cost). Eval-crowned 2026-07-01: quality 3.90 > Opus 3.60, silent-corruption 4/20 vs 11/20.",
+          "pricing_verified_date": "2026-07-15"
+        }
+      }
+    },
+    "codex": {
+      "invocation": "local Codex CLI \u2014 `codex exec` (general) / `codex exec review` (code review)",
+      "auth": "~/.codex/auth.json (Codex CLI login)",
+      "api_key_keychain_backup": "openai-api-key",
+      "api_key_env_fallback": "OPENAI_API_KEY",
+      "underlying_model": "gpt-5.6-terra (OpenAI GPT-5.6 family, accessed via Codex; 2026-08-04: replaces gpt-5.5, see review_tiers.high)",
+      "supports_caching": false,
+      "pricing_note": "the maintainered via the Codex CLI account, not the stack's API metering. Codex calls are not metered into cost_log.",
+      "notes": "v1.1.1 adaptation: the stack reaches the OpenAI / GPT-5.5 family through the locally-installed, authenticated Codex CLI rather than a direct OpenAI API key. Claude Code cannot run subagents on non-Claude models, so adversarial roles (reviewer, product-critic, security-auditor) run on a Claude model and orchestrate Codex via bash. Replaces the artifacts' `openai` provider block. See ADR-011. ADR-028: macOS Keychain item 'openai-api-key' (env OPENAI_API_KEY wins) is a resilient BACKUP for the direct-API rung \u2014 scripts/lib/openai-key.sh `oai_export` fills OPENAI_API_KEY from it when unset, so the OpenAI family survives a Codex CLI auth loss (the Gemini-CLI-death lesson, ADR-027)."
+    },
+    "gemini": {
+      "invocation": "Gemini REST API via scripts/lib/gemini-api.sh (`gmn_call`); the CLI is DEAD (IneligibleTierError, 2026-06-30)",
+      "api_base": "https://generativelanguage.googleapis.com/v1beta",
+      "endpoint": "/models/{model}:generateContent",
+      "auth_header": "x-goog-api-key",
+      "api_key_keychain": "gemini-api-key",
+      "api_key_env_fallback": "GEMINI_API_KEY",
+      "model": "gemini-3.1-pro-preview",
+      "model_verified_date": "2026-07-31",
+      "supports_caching": false,
+      "pricing_note": "billed via the Gemini API key; like codex/deepseek it is NOT metered into cost_log.",
+      "notes": "ADR-012 REVISED 2026-06-30: the Gemini CLI free tier returns IneligibleTierError ('client no longer supported \u2026 migrate to Antigravity'), so the CLI path is gone. The Gemini family is now reached via the REST API (scripts/lib/gemini-api.sh), pinned to gemini-3.1-pro-preview. Gemini roles: architecture-critic, red-team, historian. Cross-family (ADR-011): non-Claude \u2014 never point at a Claude model. 2026-07-31 /model-audit: a WebSearch claimed gemini-3.1-pro GA'd on 2026-02-19 and this was briefly applied, but a LIVE check (ListModels + a real generateContent call against gemini-3.1-pro) proved that id 404s \u2014 only gemini-3.1-pro-preview exists in the live model list. Reverted same day. Still 'preview' \u2014 no GA successor confirmed. Do not trust a GA claim from web search alone again; always confirm with a live API call before swapping this id. 2026-08-20 audit: gemini-3.7-flash CONFIRMED live (ListModels + real generateContent smoke, 'OK'). historian repointed to it (low-stakes, ~65% cheaper; intro $0.75/$3.75 thru Dec 31 then $1.50/$7.50). red-team + architecture-critic stay on 3.1-pro-preview pending a 2-week Flash shadow pilot (promote on critique-quality parity; if promoted, repoint this provider-level model field)."
+    },
+    "ollama": {
+      "base_url": "http://localhost:11434",
+      "models": {
+        "llama-3.2-3b": {
+          "context_window": 128000
+        },
+        "qwen-2.5-coder-7b": {
+          "context_window": 32768
+        },
+        "llama-3.3-70b": {
+          "context_window": 128000
+        }
+      }
+    },
+    "deepseek-cn": {
+      "data_residency": "CHINA \u2014 api.deepseek.com is hosted in China. ADR-029: routine/non-sensitive diffs ONLY; the helper hard-blocks high-stakes/sensitive content (auth/crypto/secret/payment/migration, sensitivity=high, domain-mode security|schema-migration).",
+      "api_base": "https://api.deepseek.com",
+      "endpoint": "/chat/completions",
+      "openai_compatible": true,
+      "api_key_keychain": "deepseek-cn-api-key",
+      "api_key_env_fallback": "DEEPSEEK_CN_API_KEY",
+      "supports_caching": true,
+      "pricing_note": "billed via the DeepSeek API key; like codex/gemini it is NOT metered into cost_log.",
+      "models": {
+        "deepseek-v4-pro": {
+          "api_model_id": "deepseek-v4-pro",
+          "pricing_per_million_input": 1.32,
+          "pricing_per_million_input_cache_hit": 0.003625,
+          "pricing_per_million_output": 3.96,
+          "pricing_verified_date": "2026-08-20",
+          "pricing_note": "PEAK pricing (conservative for budgeting). Surcharge went LIVE 2026-08-16: peak $1.32/$3.96 (01:00-04:00 & 06:00-10:00 UTC \u2014 lands on US evenings), off-peak $0.66/$1.98."
+        },
+        "deepseek-v4-flash": {
+          "api_model_id": "deepseek-v4-flash",
+          "pricing_per_million_input": 0.14,
+          "pricing_per_million_input_cache_hit": 0.0028,
+          "pricing_per_million_output": 0.28,
+          "pricing_verified_date": "2026-06-30"
+        }
+      },
+      "notes": "ADR-026 + ADR-029: DeepSeek-v4 third adversarial voice via scripts/lib/deepseek-review.sh, advisory. CHINA-HOSTED \u2192 ROUTINE/non-sensitive diffs ONLY; the helper's data-residency guard hard-blocks (return 8) any high-stakes/sensitive content regardless of caller. Wired into reviewer (routine), effectively-off for security-auditor, and NOT used by red-team (always high-stakes). Cross-family (ADR-011): non-Claude \u2014 never point at a Claude model. deepseek-chat/reasoner ids retire 2026-07-24; use v4 ids. Key: macOS Keychain 'deepseek-cn-api-key' (env DEEPSEEK_CN_API_KEY). 2026-07-15: official V4 launch ANNOUNCED 2x baseline pricing during Beijing peak hours (9-12 & 14-18 CST). CONFIRMED LIVE 2026-08-16 (2026-08-20 audit): peak surcharge active \u2014 see deepseek-v4-pro pricing_note. Keep/cut decision on this third voice left open by the audit."
+    },
+    "xai": {
+      "data_residency": "US-hosted \u2014 no ADR-029-style residency block needed.",
+      "api_base": "https://api.x.ai/v1",
+      "endpoint": "/chat/completions",
+      "openai_compatible": true,
+      "api_key_keychain": "GROK_API_KEY",
+      "api_key_env_fallback": "GROK_API_KEY",
+      "supports_caching": true,
+      "pricing_note": "billed via the xAI API key; like codex/gemini/deepseek it is NOT metered into cost_log.",
+      "models": {
+        "grok-4.5": {
+          "api_model_id": "grok-4.5",
+          "context_window": 500000,
+          "pricing_per_million_input": 2.0,
+          "pricing_per_million_input_cache_hit": 0.5,
+          "pricing_per_million_output": 6.0,
+          "pricing_note": "Surcharge above 200K context. Verified live 2026-07-15.",
+          "pricing_verified_date": "2026-07-15"
+        }
+      },
+      "notes": "2026-07-15 audit (owner decision, option b): Grok 4.5 PILOT as fourth advisory voice on routine reviews \u2014 peer of the DeepSeek third voice. Advisory-only, never blocks; no steady-state/blocking role until it passes the silent-corruption bake-off (ADR-040 loop, same bar as GPT-5.6 Sol). New cross-family lineage (xAI \u2260 Claude/OpenAI/Google/DeepSeek). SWE-bench Verified 86.6%, #1 agentic tool use, cheapest frontier-class voice. Helper scripts/lib/grok-review.sh \u2014 TO CREATE (open follow-up). Key verified in macOS Keychain 2026-07-15."
+    }
+  },
+  "_effort_doc": "ADR-056: per-agent reasoning-effort baseline in subagent_assignments.*.effort, enum {low,medium,high,xhigh,max} (Workflow-native \u2014 see docs/ADRs/056-subagent-effort-gradient.md). Deliberately a DIFFERENT vocabulary from session_prefs.model_effort (minimal/fast/balanced/thorough/max), which is a separate session-wide dial this does not touch. Read by skills/foreman/SKILL.md's Dispatch protocol step 2 (prompt-injected directive for bare Agent-tool dispatches, best-effort \u2014 the Agent tool has no native effort parameter) and by the same skill's Dynamic-workflows guardrails point 6 (real opts.effort on Workflow's agent() calls, which DOES support it \u2014 no separate dispatch/ultracode skill edits were needed, foreman is the single place this convention is documented). escalation_triggers bump the baseline for a specific dispatch when the listed domain_mode is active (first array match wins); matched against stack-config.json's domain_mode (array or bare string, ADR-053). orchestrated_by roles (reviewer, product-critic, red-team, architecture-critic, historian) are NOT structurally parallel despite the shared field: reviewer/product-critic run on routine, high-frequency dispatches where the Claude-side work is thin piping/composition (medium); red-team/architecture-critic are invoked only for high-stakes decisions and must critically assess, not just relay, the cross-family output (high); historian is periodic low-stakes trend summarization (low, same bucket as scribe/librarian).",
+  "subagent_assignments": {
+    "architect": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high"
+    },
+    "implementer": {
+      "primary": "anthropic/claude-sonnet-5",
+      "escalation": "anthropic/claude-opus-5",
+      "effort": "medium",
+      "escalation_triggers": [
+        {
+          "domain_mode": "financial-code",
+          "primary": "anthropic/claude-opus-5",
+          "effort": "high",
+          "evidence": "docs/model-eval/2026-08-07-implementer-webhook-reverification.md \u2014 3/3 sonnet-5/medium runs shipped a check-then-write race on exactly-once payment code; 3/3 opus-5/high runs closed it. Verified by code inspection, not scoring. Note: sonnet-5/medium -> sonnet-5/high did NOT fix it, so this trigger must raise the MODEL, not just effort."
+        }
+      ]
+    },
+    "validator": {
+      "primary": "anthropic/claude-sonnet-5",
+      "escalation": "anthropic/claude-opus-5",
+      "effort": "medium"
+    },
+    "reviewer": {
+      "primary": "codex/gpt-5.6-terra",
+      "routine_primary": "local/qwen2.5-coder:32b",
+      "routine_escalation": "codex/gpt-5.4",
+      "orchestrated_by": "anthropic/claude-sonnet-5",
+      "effort": "medium",
+      "notes": "v1.1.1: adversarial review via local Codex CLI \u2014 see ADR-011. ADR-025: tiered by stakes via scripts/lib/review-router.sh \u2014 high-stakes diffs use codex/gpt-5.6-terra@high (2026-08-04: replaces gpt-5.5); routine diffs use local Qwen first, escalate to codex/gpt-5.4. Both tiers stay cross-family (never Claude). Model IDs resolved from review_tiers below. NOTE: that review_tiers.high/routine 'effort' field governs the cross-family Codex call's own effort \u2014 a separate, pre-existing knob from this entry's 'effort', which governs the Claude-side orchestration reasoning."
+    },
+    "tester": {
+      "primary": "anthropic/claude-sonnet-5",
+      "effort": "medium"
+    },
+    "documenter": {
+      "primary": "anthropic/claude-sonnet-5",
+      "effort": "medium"
+    },
+    "scribe": {
+      "primary": "anthropic/claude-haiku-4-5-20251001",
+      "effort": "low"
+    },
+    "ops": {
+      "primary": "anthropic/claude-haiku-4-5-20251001",
+      "escalation": "anthropic/claude-sonnet-5",
+      "effort": "low"
+    },
+    "product-critic": {
+      "primary": "codex/gpt-5.6-terra",
+      "routine_primary": "local/qwen2.5-coder:32b",
+      "routine_escalation": "codex/gpt-5.4",
+      "orchestrated_by": "anthropic/claude-sonnet-5",
+      "effort": "medium",
+      "notes": "v1.1.1: product critique via local Codex CLI \u2014 see ADR-011. ADR-025: tiered by stakes (review-router.sh); product critique is rarely high-stakes so usually routes routine (local Qwen). Cross-family preserved. 2026-08-04: high tier moved gpt-5.5 -> gpt-5.6-terra."
+    },
+    "designer": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high"
+    },
+    "red-team": {
+      "primary": "gemini/gemini-3.1-pro-preview",
+      "orchestrated_by": "anthropic/claude-sonnet-4-6",
+      "effort": "high",
+      "notes": "v1.1.1: red-team analysis via local Gemini CLI \u2014 see ADR-012. 2026-08-20 audit: 2-week gemini-3.7-flash shadow PILOT authorized alongside 3.1-pro-preview; promote on parity."
+    },
+    "security-auditor": {
+      "primary": "codex/gpt-5.6-terra",
+      "routine_primary": "local/qwen2.5-coder:32b",
+      "routine_escalation": "codex/gpt-5.4",
+      "second_pass": "anthropic/claude-opus-5",
+      "orchestrated_by": "anthropic/claude-sonnet-5",
+      "effort": "high",
+      "escalation_triggers": [
+        {
+          "domain_mode": "financial-code",
+          "effort": "xhigh"
+        },
+        {
+          "domain_mode": "schema-migration",
+          "effort": "xhigh"
+        }
+      ],
+      "notes": "v1.1.1: primary audit via local Codex CLI; belt-and-suspenders Opus second pass on novel crypto/auth \u2014 see ADR-011. ADR-025: tiered by stakes (review-router.sh). Security work classifies high more often (security/auth/crypto paths \u2192 gpt-5.6-terra@high, 2026-08-04: replaces gpt-5.5); the Opus second pass on novel crypto/auth is UNCHANGED. effort/escalation_triggers (ADR-056) governs the Claude-side orchestration only, separate from review_tiers.high.effort."
+    },
+    "performance-engineer": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high"
+    },
+    "data-engineer": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high"
+    },
+    "integration-specialist": {
+      "primary": "anthropic/claude-sonnet-5",
+      "effort": "medium"
+    },
+    "incident-commander": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high"
+    },
+    "architecture-critic": {
+      "primary": "gemini/gemini-3.1-pro-preview",
+      "orchestrated_by": "anthropic/claude-sonnet-4-6",
+      "effort": "high",
+      "notes": "v1.1.1: whole-repo architectural critique via local Gemini CLI \u2014 see ADR-012. 2026-08-20 audit: 2-week gemini-3.7-flash shadow PILOT authorized alongside 3.1-pro-preview; promote on parity."
+    },
+    "accessibility-auditor": {
+      "primary": "anthropic/claude-sonnet-5",
+      "effort": "medium"
+    },
+    "user-docs-writer": {
+      "primary": "anthropic/claude-sonnet-5",
+      "effort": "medium",
+      "notes": "ADR-045. Sonnet default: structured walkthrough writing is Sonnet-shaped and vision-token volume makes Opus wasteful per guide. Opus escalation via frontmatter escalation_triggers (whole-product onboarding IA; financial or safety-relevant user flows), mirroring documenter."
+    },
+    "historian": {
+      "primary": "gemini/gemini-3.7-flash",
+      "orchestrated_by": "anthropic/claude-sonnet-4-6",
+      "effort": "low",
+      "notes": "v1.1.1: long-context history review via local Gemini CLI \u2014 see ADR-012. Tier 4 subagent. 2026-08-20 audit: repointed to gemini-3.7-flash (live-verified same day); low-stakes seat, ~65% cheaper."
+    },
+    "librarian": {
+      "primary": "anthropic/claude-haiku-4-5-20251001",
+      "effort": "low"
+    },
+    "estimator": {
+      "primary": "anthropic/claude-sonnet-5",
+      "effort": "medium"
+    },
+    "foreman-team-lead": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high",
+      "notes": "v1.1: Used in agent-teams orchestration mode only. Main-thread mode uses foreman as a skill \u2014 no subagent invocation."
+    },
+    "local-ops": {
+      "primary": "ollama/llama3.1:8b",
+      "effort": "low",
+      "notes": "Tier 5 local subagent. Default model per agents/local-ops.md (escalates to ollama/qwen2.5-coder:32b for code-heavy tasks). Model string must match an ollama tag that tier-installer.sh actually pulls and HARDWARE.md recommends \u2014 keep these three in sync."
+    },
+    "pm": {
+      "primary": "anthropic/claude-opus-5",
+      "effort": "high",
+      "notes": "ADR-060/REQ-160 PM roster seat. Opus-class judgment tier \u2014 priority reasoning and challenge composition over facts code already computed (REQ-141/111), never the facts themselves. ASSUMPTION 9: plan approval (this task's review) is the recorded signoff for routing a judgment-only agent to Opus. Joins config/behavior-matrix.json's pm row via its per-cell `execution: {tier: \"opus\", ...}` (REQ-123) \u2014 tier name 'opus' resolves against model_fit.tier_ladder[2] below, kept in sync with this entry's primary model."
+    }
+  },
+  "model_fit": {
+    "_doc": "ADR-033 post-session receipt: the Anthropic tier ladder the receipt walks (cheap->strong). Ids MUST exist in providers.anthropic.models. /model-audit keeps this fresh alongside pricing. Ratio bands live in the hook/lib, not here.",
+    "_v1_tunable": true,
+    "tier_ladder": [
+      "claude-haiku-4-5-20251001",
+      "claude-sonnet-5",
+      "claude-opus-5",
+      "claude-fable-5"
+    ]
+  },
+  "review_tiers": {
+    "_doc": "ADR-025 adversarial-review router tiers. Read by scripts/lib/review-router.sh (env var > this block > built-in default). Repoint models here when the Tier-5 local box lands \u2014 no script edit. Every tier MUST be a non-Claude family (ADR-011 cross-family rule); never set a Claude model here.",
+    "_doc_codex_transport": "ADR-030: HOW the OpenAI/GPT-5.5 family is reached is a separate setting `codex_transport` (api|cli), NOT configured here. Default 'api' (scripts/lib/openai-review.sh, oair_call \u2192 OpenAI API); 'cli' uses `codex exec` with automatic API fallback. Resolution (highest first): env REVIEW_CODEX_TRANSPORT > project .claude/stack-config.json .review.codex_transport > default 'api'. Set per-project via /project-init, per-session via /session.",
+    "high": {
+      "engine": "codex",
+      "model": "gpt-5.6-terra",
+      "effort": "high",
+      "when": "diff touches auth/crypto/payment/migration/RLS/secret paths, or domain-mode security|schema-migration, or sensitivity=high",
+      "pilot_note": "2026-08-04 audit: swapped from gpt-5.5 (now legacy-ambiguous, see model-audits/2026-08-04.md) to gpt-5.6-terra \u2014 Terra beats gpt-5.5 on SWE-Bench Pro (63.4% vs 59.4%) and 6 other benchmarks at 40% of flagship Sol's price ($2/$12 vs Sol's $5/$30, and well under gpt-5.5's $5/$30 list price). Sol itself remains BLOCKED, unchanged from prior audits: METR found Sol gamed its SWE eval at the highest detected rate of any publicly tested model, and separately attempted a privilege-escalation attack against its own container daemon after network access was cut \u2014 classified as agentic misalignment with adversarial intent. No rebuttal found as of 2026-08-04; block stands."
+    },
+    "routine": {
+      "engine": "local",
+      "model": "qwen2.5-coder:32b",
+      "escalation_engine": "codex",
+      "escalation_model": "gpt-5.4",
+      "escalation_effort": "medium",
+      "when": "everything else; run local Qwen first, escalate to escalation_model only on low-confidence or non-trivial diff",
+      "tier5_note": "When the high-RAM/GPU box arrives, repoint model (and optionally escalation_model) to a larger local model \u2014 e.g. qwen2.5-coder:72b / kimi / deepseek-class. A strong enough local model can also absorb the high tier, driving OpenAI review spend toward $0. Track under the Tier-5 local-model expansion plan.",
+      "third_voice": {
+        "engine": "deepseek-cn",
+        "model": "deepseek-v4-pro",
+        "advisory": true,
+        "blocks": false,
+        "data_residency": "CHINA",
+        "helper": "scripts/lib/deepseek-review.sh",
+        "when": "ROUTINE / non-sensitive diffs ONLY (ADR-029) \u2014 additive to the routine review, never auto-blocks. China-hosted: the helper hard-blocks (return 8) any high-stakes/sensitive content (auth/crypto/secret/payment/migration, sensitivity=high, domain-mode security|schema-migration) regardless of caller. Moved off the high tier \u2014 it must never see high-stakes code."
+      },
+      "fourth_voice": {
+        "engine": "xai",
+        "model": "grok-4.5",
+        "advisory": true,
+        "blocks": false,
+        "data_residency": "US",
+        "helper": "scripts/lib/grok-review.sh",
+        "status": "PILOT (2026-07-15 audit, owner decision option b) \u2014 wired 2026-08-04 into agents/reviewer.md (Step 0.7) and agents/security-auditor.md, same session the fifth_voice was wired. 2-week shadow window starts now; the prior 3-week gap (script existed 2026-07-15, no call site until 2026-08-04) is closed.",
+        "when": "Routine reviews, additive fourth advisory voice (peer of the DeepSeek third voice), never auto-blocks. US-hosted \u2014 no residency hard-block. No steady-state/blocking role until it passes the silent-corruption bake-off (ADR-040); if the 2-week shadow passes, revisit routine-escalation (option a) or red-team (option c) next audit."
+      },
+      "fifth_voice": {
+        "engine": "codex",
+        "model": "gpt-5.1-codex-mini",
+        "advisory": true,
+        "blocks": false,
+        "data_residency": "US",
+        "helper": "scripts/lib/openai-mini-review.sh",
+        "status": "PILOT (2026-08-04 audit) \u2014 wired into agents/reviewer.md (Step 0.7) and agents/security-auditor.md; 2-week shadow starts once this lands.",
+        "when": "Routine reviews only, additive fifth advisory voice, never auto-blocks. Runs on the account's free daily quota (up to 10M tokens/day, mini/nano tier \u2014 screenshot-confirmed 2026-08-04) at ~$0 marginal cost. US-hosted \u2014 no residency block. Shares a vendor (OpenAI) with the routine-escalation rung (gpt-5.4) \u2014 weaker family-independence than DeepSeek/Grok; do not treat it as equally independent when weighing findings. Same silent-corruption bake-off caveat as Grok's fourth_voice (no dedicated harness exists yet \u2014 see .claude/plans/2026-08-04-openai-free-mini-fifth-voice-pilot.md)."
+      }
+    }
+  },
+  "notes": [
+    "v1.6.0 (2026-08-04, ADR-056): added per-agent 'effort' baseline (enum low|medium|high|xhigh|max, Workflow-native vocabulary \u2014 deliberately distinct from session_prefs.model_effort) to every subagent_assignments entry, plus escalation_triggers on security-auditor (financial-code/schema-migration -> xhigh). The Agent tool used by foreman's main-thread dispatch has no native effort parameter, so consumption there is a best-effort prompt-injected directive; Workflow's agent() opts.effort IS a real parameter. Both wired in skills/foreman/SKILL.md alone (Dispatch protocol step 2, and Dynamic-workflows guardrails point 6) \u2014 dispatch/SKILL.md delegates to foreman and needed no edit; ultracode/SKILL.md has no roster/agentType content to extend. See docs/ADRs/056-subagent-effort-gradient.md and .claude/plans/2026-08-04-subagent-effort-gradient.md.",
+    "ADR-045: user-docs-writer added (22nd named role, 24th agent file). Specialist bench, installs at Tier 3. Scope-c build: reset-required/manual docs-tests refused, not executed.",
+    "ADR-025: adversarial review (reviewer, security-auditor, product-critic) is tiered by stakes via scripts/lib/review-router.sh \u2014 high \u2192 codex/gpt-5.6-terra@high (2026-08-04: replaces gpt-5.5); routine \u2192 local Qwen first, escalate codex/gpt-5.4. Scope fixed to the diff (base..head), not whole-repo. Routes log to subagent-runs.jsonl (event:review_route) to verify the high/routine split. Cross-family (ADR-011) holds on both tiers.",
+    "v1.5.0 (2026-07-15 audit, applied 2026-07-16 at SOURCE \u2014 ~/Antigravity/claude-code-stack \u2014 because tier-manifest installs re-copy this file into ~/.claude and had reverted three prior applies): sonnet roles \u2192 claude-sonnet-5; gemini roles \u2192 gemini-3.1-pro-preview; + claude-fable-5/claude-sonnet-5 provider entries; tier_ladder gains sonnet-5 + fable-5; routine review escalation \u2192 gpt-5.6-terra; xai provider + Grok 4.5 fourth advisory voice (PILOT). Fable 5 = manual above-Opus escalation ceiling, escalation-only, never steady-state. Open follow-ups: create scripts/lib/grok-review.sh; Sept audit bumps Sonnet 5 to $3/$15.",
+    "v1.1.1 change: OpenAI/GPT-5.5-family work routes through the local Codex CLI (provider `codex`); Gemini-family work routes through the local Gemini CLI (provider `gemini`). Neither uses a direct API key. Adversarial roles run on a Claude model and orchestrate the respective CLI. See ADR-011 (Codex) and ADR-012 (Gemini).",
+    "v1.1 change: Foreman is a skill (skills/foreman/SKILL.md) in main-thread orchestration mode. Only in agent-teams mode is foreman a separate session (team-lead role).",
+    "Pricing verified against vendor docs on 2026-05-15. Anthropic: platform.claude.com. Apr 2026 friction was a 3.4x cost underforecast \u2014 verify live before any cost-sensitive operation.",
+    "/model-audit skill (Tier 4) re-verifies monthly and proposes changes.",
+    "Codex and Gemini calls are billed via their own CLI accounts and are NOT metered into cost_log \u2014 Tier 4 cost reporting does not see adversarial-review / red-team / architecture-critic / historian spend.",
+    "Gemini 3.1 Pro (2M context, released Feb 2026) \u2014 the Gemini CLI selects its own model; revisit the -m override in the next /model-audit.",
+    "2026-07-29 targeted re-check (not a full /model-audit \u2014 no pricing/benchmark refresh, last_audited unchanged): confirmed gemini-3.1-pro-preview is still the only Gemini id documented anywhere in this repo (ADR-027, gemini provider block, scripts/lib/gemini-api.sh). No stable/GA successor found in-repo, so left unpromoted; provider.gemini.notes dated and flagged for the next real /model-audit to verify externally before any swap.",
+    "2026-08-04 targeted repoint (not a full /model-audit): review_tiers.routine.escalation_model and the matching reviewer/product-critic/security-auditor routine_escalation fields moved gpt-5.6-terra -> gpt-5.4. Reason: the OpenAI account is eligible for a free daily quota (up to 1M tokens/day) on gpt-5.4 and earlier \u2014 gpt-5.5/5.6-family models are NOT covered. scripts/lib/review-router.sh's own hardcoded fallback and header comment, and the reviewer subagent's notes text, already said gpt-5.4 \u2014 only this JSON field had drifted to gpt-5.6-terra, so this also fixes a stale-config mismatch, not just a cost optimization. The routine tier is explicitly the non-high-stakes path (ADR-025), so trading the newer paid model for a free one here does not touch the quality gate that matters \u2014 review_tiers.high (gpt-5.5@high, auth/crypto/payment/migration/RLS/secret paths) is deliberately left untouched.",
+    "2026-08-04 targeted /model-audit (same day as the repoint above, separate action \u2014 triggered by the same free-tier discovery but scoped to pricing/new-model check, not the routine escalation fix): review_tiers.high moved gpt-5.5 -> gpt-5.6-terra, and every subagent field/note referencing gpt-5.5 (reviewer, product-critic, security-auditor primaries and notes, providers.codex.underlying_model) updated to match. Evidence: GPT-5.6 Terra scores 63.4% vs gpt-5.5's 59.4% on SWE-Bench Pro (and leads on 6 of 11 published benchmarks total) while costing $2/$12 per 1M tokens vs gpt-5.5's $5/$30 list price \u2014 cheaper AND higher-scoring on the capability this tier exists for. gpt-5.6-sol (the actual flagship) stays BLOCKED, unchanged: METR found it gamed its SWE eval at the highest rate of any tested model and attempted a privilege-escalation attack against its own container daemon; no rebuttal found this cycle. NOTE: neither gpt-5.5 nor gpt-5.6-terra is covered by the OpenAI free-tier daily quota that triggered this audit (only gpt-5.4-and-earlier is) \u2014 this swap is justified purely on benchmark + list-price grounds, not free-tier eligibility. Full report: docs/model-audits/2026-08-04.md.",
+    "2026-08-04 propagation-gap fix: this audit's gpt-5.6-terra swap was applied directly to ~/.claude/config/model-routing.json before this repo's own copy was updated to match \u2014 backwards from the documented apply-at-SOURCE practice above, and dangerous, since install.sh/update.sh does a plain unconditional overwrite of ~/.claude's copy from source (config/tier-manifests/tier-2.json, no merge flag) and would have silently reverted the live fix on the next stack update. Fixed by syncing source to the already-applied state (commit a4c381e) \u2014 do not re-derive this delta from the audit doc, source now matches. Separately, discovered scripts/lib/review-router.sh's rr_config_file() only ever checked <repo>/config/model-routing.json (a per-repo override) and NEVER fell back to ~/.claude/config/model-routing.json (the machine-wide install target) \u2014 so every project on the machine except this stack's own source repo silently ignored config entirely and used review-router.sh's hardcoded def values (gpt-5.5, gpt-5.4, qwen2.5-coder:32b, ...) regardless of what model-routing.json said. Model-routing changes were NOT actually propagating to any other repo before this fix. Fixed via .claude/plans/2026-08-04-review-router-global-fallback.md (Approach A): rr_config_file() now falls back to ~/.claude/config/model-routing.json when no repo-local override exists, before finally falling to the hardcoded default. 3 new regression tests added to tests/test-review-router.sh (section 13); full 48/48 suite passes."
+  ]
+}

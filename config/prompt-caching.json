@@ -1,0 +1,46 @@
+{
+  "$schema": "../schemas/prompt-caching-schema.json",
+  "version": "1.1.0",
+  "description": "Which subagents and skills use prompt caching and what they cache. Caching reduces cost and latency for components that repeatedly read large stable contexts.",
+  "providers_supporting_caching": ["anthropic", "openai", "google"],
+  "subagent_caching_config": {
+    "foreman-skill": {
+      "enabled": true,
+      "applies_to": "main-thread orchestration mode (foreman is a skill, not a subagent — see ADR-008)",
+      "cache_targets": ["~/.claude/skills/foreman/SKILL.md", "~/.claude/config/model-routing.json", "<project>/.claude/stack-config.json"],
+      "rationale": "Main thread reads foreman skill + routing config + stack-config on every dispatch decision. These rarely change within a session."
+    },
+    "foreman-team-lead": {
+      "enabled": true,
+      "applies_to": "agent-teams orchestration mode",
+      "cache_targets": ["~/.claude/skills/foreman/SKILL.md", "~/.claude/config/model-routing.json", "<project>/.claude/stack-config.json", "~/.claude/agents/"],
+      "rationale": "Team-lead session uses the foreman skill as routing source of truth + needs agent list for spawning teammates."
+    },
+    "architecture-critic": {
+      "enabled": true,
+      "cache_targets": ["<project>/**/*.{ts,tsx,js,py,sql,md}"],
+      "rationale": "Reads entire repo every invocation. Massive cache benefit."
+    },
+    "historian": {
+      "enabled": true,
+      "cache_targets": ["<project>/docs/handoffs/", "<project>/docs/ADRs/", "<project>/docs/incidents/"],
+      "rationale": "Reads all archived state monthly. Same input set across runs."
+    },
+    "reviewer": {
+      "enabled": true,
+      "cache_targets": ["<project>/CLAUDE.md", "<project>/docs/ARCHITECTURE.md"],
+      "rationale": "Reads project conventions on every review."
+    },
+    "security-auditor": {
+      "enabled": true,
+      "cache_targets": ["<project>/docs/SECURITY.md", "<project>/migrations/"],
+      "rationale": "Reads security posture + schema on every audit."
+    }
+  },
+  "implementation_notes": {
+    "anthropic": "Use cache_control: { type: 'ephemeral' } on cached messages. 5-minute TTL.",
+    "openai": "Use Prompt Caching API; cached prefixes auto-detected by repeated content >1024 tokens.",
+    "google": "Use context caching for Gemini 1.5+; explicit CachedContent objects."
+  },
+  "monitoring": "cache_read_tokens and cache_write_tokens are logged to cost_log table. Tier 4 /agent-performance-review reports cache hit rate."
+}

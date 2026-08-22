@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-receipt.json",
+  "title": "Stack Receipt",
+  "description": "stack-receipt/v1 (ADR-087 D1). One envelope, two consumers: review-gate receipts (kind=review, minted by hooks/review-receipt-mint.sh from a genuine scripts/panel-review.sh run) and rollout receipts (kind=rollout, produced by scripts/rollout-verify.sh). A receipt failing this schema is treated as ABSENT, never as a pass. Only trustworthy where its directory (state/attest/**) is denyWrite-protected -- a same-user claim, never a cryptographic one (D2).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "writer", "as_of", "max_age_s", "subject", "verdict", "reason", "needs_human", "evidence", "error"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["stack-receipt/v1"],
+      "description": "Schema identifier and version tag. Always the literal string stack-receipt/v1."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["review", "rollout", "broker"],
+      "description": "Closed set of receipt kinds sharing one envelope. kind=broker (D18): minted by the stack-broker daemon for every operation request, including refusals; subject.kind is operation and broker facts live under evidence.broker."
+    },
+    "writer": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Name+version of the minting script, e.g. review-receipt-mint.sh@1 or rollout-verify.sh@1."
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO-8601, set by the MINTER's own clock -- never taken from the payload."
+    },
+    "max_age_s": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "A receipt older than this is NOT-CHECKED, never CLEAN (D11). Default 604800 (7 days)."
+    },
+    "subject": {
+      "type": "object",
+      "description": "subject.kind is a CLOSED set: artifact | patch | config-dir. Exactly one subject kind's fields may be present -- a receipt carrying both content_sha and patch_sha is invalid.",
+      "additionalProperties": false,
+      "required": ["kind", "repo_root", "repo_hash", "mint_head_commit"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["artifact", "patch", "config-dir", "operation"] },
+        "path": { "type": ["string", "null"], "maxLength": 500 },
+        "content_sha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "patch_sha": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "base_commit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "reviewed_head": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "repo_root": { "type": "string" },
+        "repo_hash": { "type": "string" },
+        "mint_head_commit": { "type": ["string", "null"] }
+      },
+      "not": {
+        "required": ["content_sha", "patch_sha"],
+        "properties": { "content_sha": { "not": { "type": "null" } }, "patch_sha": { "not": { "type": "null" } } }
+      }
+    },
+    "verdict": {
+      "type": "string",
+      "description": "review kind: 'reviewed'. rollout kind: 'all-confirmed' | 'gaps' | 'couldnt-check'."
+    },
+    "reason": { "type": ["string", "null"], "maxLength": 200 },
+    "needs_human": { "type": "boolean" },
+    "evidence": {
+      "type": "object",
+      "description": "review kind: review-evidence/v1 (D3a). rollout kind: D7's evidence block."
+    },
+    "error": {
+      "type": ["string", "null"],
+      "maxLength": 200,
+      "description": "Sanitized per D19 (rcpt_sanitize) at write time. Never raw bytes on disk."
+    }
+  }
+}

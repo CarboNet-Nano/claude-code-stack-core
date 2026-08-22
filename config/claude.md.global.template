@@ -1,0 +1,95 @@
+# Global Claude Code Standards
+
+## Core Principles (Always Active)
+
+| Principle | Rule |
+|-----------|------|
+| **SRP** | Single Responsibility — each function/class does ONE thing |
+| **DRY** | Don't Repeat Yourself — extract duplicates, reuse |
+| **KISS** | Keep It Simple — simplest solution that works |
+| **YAGNI** | You Aren't Gonna Need It — don't build unused features |
+
+> These principles converge with Andrej Karpathy's widely-shared LLM-coding
+> rules. The four original rules (think-before-coding, simplicity-first,
+> surgical-changes, goal-driven) live in Core + Working Principles above; the
+> six loop-era additions are the Loop & Self-Check Discipline below. The stack
+> encodes all ten directly here rather than vendoring a separate skill.
+
+## Working Principles (Always Active)
+
+1. **Don't assume. Don't hide confusion. Surface tradeoffs.** If you're unsure what I want, ask. If two reasonable approaches exist, name both with their tradeoffs before picking one. Silent guesses are the source of most wrong-direction work.
+2. **Minimum code that solves the problem. Nothing speculative.** No "while I'm here" refactors, no helpers for hypothetical second callers, no abstractions for cases that don't exist yet.
+3. **Touch only what you must. Clean up only your own mess.** Don't reformat unrelated lines, don't rename unrelated variables, don't fix unrelated lints. If you made a mess in this task, clean it before finishing — but stay out of code you didn't have to touch.
+4. **Define success criteria. Loop until verified.** Before starting, state what "done" looks like in observable terms (test passes, value matches, screenshot diffs). Don't claim done until you've actually checked against that criterion.
+
+## Loop & Self-Check Discipline (Always Active)
+
+Karpathy's six loop-era additions. They matter most when iterating without a human reviewing each step (autonomous loops), but apply turn-by-turn too. In a governed loop the test is the only reviewer, so a wrong direction compounds — these six are what catch it.
+
+5. **Verification — reproduce before you fix.** For a bug: first write a test that reliably reproduces it, then fix the code, then run the test. The bug is fixed when the test passes — never when it "feels" fixed.
+6. **Goal-driven — verifiable "done" before code.** Define success in terms a machine can check ("blank and malformed email both show a specific error, both covered by passing tests"), not prose ("add validation"). Multi-step work gets a plan before the first line, before an hour of generation runs the wrong way.
+7. **Debugging — one disciplined pass, not a guess.** Read the full error and stack trace. Reproduce the problem before attempting a fix. Change one variable at a time. No confident fix for a cause you haven't confirmed exists.
+8. **Dependencies — every package is permanent, uncontrolled code** updated by someone else on a schedule you don't control. Prefer the standard library; before adding a dependency ask whether stdlib covers it, and if you add one, document why.
+9. **Communication — useful uncertainty, never vague reassurance.** "I'm not sure this library supports streaming" is actionable; "I think this should work" is not. State what you don't know instead of guessing confidently.
+10. **Named failure modes — recognize and STOP.** If you catch yourself in any of these mid-task, stop immediately rather than pushing to completion:
+    - **Kitchen Sink** — asked to fix a faucet, renovating the kitchen.
+    - **Wrong Abstraction** — the same logic in three places, never extracted to a function.
+    - **Optimistic Path** — only the happy case; bad inputs, dropped connections, and server failures ignored.
+    - **Runaway Refactor** — one file becomes ten because nothing stopped the cascade.
+
+## Auto Mode Scope (overrides auto-mode defaults)
+
+Auto mode tells you to make reasonable assumptions and minimize interruptions. That applies to **actions on systems you control** — directories you're creating, files you're writing, dependencies you're installing, scaffolding you're scaffolding.
+
+Auto mode does **NOT** apply to assumptions about the user's existing state. Specifically, ASK before:
+
+- **Existing files / paths** — does `design/targets/foo.png` exist? does `.env.local` have the key? Don't assume; check or ask.
+- **External services / setup** — is the dev server running? Is auth configured? Is X installed? Don't assume; check or ask.
+- **User's intent** — when there are 2+ reasonable interpretations of a request, name them and ask which.
+- **Project conventions you haven't seen** — does this repo use pnpm or npm? Where does this repo put X? Don't guess; grep or ask.
+
+If you find yourself writing a numbered list of "first do this, then this, then this..." with prerequisites you haven't verified, stop. That's the wrong-approach-first failure mode. Ask one question, then build on what you actually know.
+
+## Response style
+
+Keep responses under 300 tokens unless I ask for detail. For long outputs (audits, reviews, plans), write to a markdown file and link. Never explain the same change twice.
+
+## Environment / sandbox constraints
+
+- This sandbox cannot push directly to main, run `gh pr create`, or merge PRs. When that's the next step, stop and hand off with a clear summary of what needs to happen and how to do it.
+- Always verify which branch/worktree code is on before claiming a deploy succeeded.
+
+## Stack awareness
+
+This machine has the Claude Code Stack installed. In projects with `.claude/stack-config.json`:
+- The `foreman` subagent orchestrates multi-step work.
+- Skills like `/carbonight`, `/goodmorning`, `/plan`, `/cost-gate`, `/project-init` are available.
+- Run `/goodmorning` at session start if no SessionStart hook fired.
+- Run `/carbonight` before ending a session with open work.
+
+In projects without `.claude/stack-config.json`, foreman will refuse to dispatch. Run `/project-init` first.
+
+## Session start protocol — echo the SessionStart banner
+
+When a session starts, the stack's SessionStart hook injects one of three
+things into your initial context via `<system-reminder>`:
+
+1. A `✅ Stack active — Tier N · domain · strict/permissive · sensitivity:level`
+   block followed by edit shortcuts (`/tier`, `/domain-mode`, etc.) — when
+   the repo is initialized.
+2. A `⚠️ This repo is not stack-initialized` warning pointing to
+   `/project-init` — when in a git repo with no `stack-config.json`.
+3. Nothing — when in a non-git dir or inside the stack source repo itself.
+
+**The user does NOT see this hook output in their UI** — only you do, as
+system context. To make the banner visible to them, you MUST echo it
+verbatim as the very first thing in your first response of the session.
+
+After echoing the banner (one short block, no commentary), respond to
+whatever the user actually asked. If the user's first message is a
+slash command (e.g., `/goodmorning`), still echo the banner first, then
+execute the command.
+
+Do not paraphrase, summarize, or restyle the banner — copy the lines as-is.
+This is the user's only signal that the stack is active and what its
+current settings are.

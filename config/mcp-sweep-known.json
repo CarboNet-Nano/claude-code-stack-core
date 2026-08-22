@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "wiredAliases": {
+    "context7": ["npm:@upstash/context7-mcp", "gh:upstash/context7"],
+    "playwright": ["gh:microsoft/playwright-mcp"]
+  },
+  "ignored": {
+    "npm:tavily-mcp": "unwired 2026-08-09 — zero uses in any transcript since install",
+    "gh:tavily-ai/tavily-mcp": "unwired 2026-08-09 — zero uses in any transcript since install",
+    "gh:exa-labs/exa-mcp-server": "unwired 2026-08-09 — zero uses in any transcript since install",
+    "gh:figma/figma-mcp": "unwired 2026-08-09 — zero uses in any transcript since install",
+    "npm:@sentry/mcp-server": "unwired 2026-08-09 — zero uses in any transcript since install",
+    "gh:getsentry/sentry-mcp": "unwired 2026-08-09 — zero uses in any transcript since install"
+  }
+}

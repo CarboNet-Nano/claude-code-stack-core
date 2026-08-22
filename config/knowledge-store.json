@@ -1,0 +1,20 @@
+{
+  "$comment": "ADR-060 S1 directory backing store, Layer A (P1b). One entry per org. Never write a credential (connection string) here — resolve() reads it at runtime from $STACK_DB_URL or the macOS Keychain item named in credential_ref.keychain_item. See tools/pm/src/directory.mjs.",
+  "schema_version": 1,
+  "orgs": [
+    {
+      "org_id": "carbonet",
+      "descriptor": {
+        "database": "knowledge",
+        "ssl_mode": "require"
+      },
+      "credential_ref": {
+        "env_var": "STACK_DB_URL",
+        "keychain_item": "stack-db-url-carbonet"
+      },
+      "capabilities": {},
+      "schema_version": 6,
+      "user_id": "bb4164c2-f930-495a-9769-7e1bf2167351"
+    }
+  ]
+}

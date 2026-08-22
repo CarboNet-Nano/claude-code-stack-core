@@ -1,0 +1,82 @@
+{
+  "schema": "broker-ops/v1",
+  "comment": "D18 §6.3 — the closed op set. Declaration, never inference (ADR-088 D1a). No param may be of type command/sql/url/path; a capability that needs one gets its own named op with typed params. The daemon re-reads this file only on SIGHUP from root.",
+  "ops": [
+    { "id": "cloudflare.worker.list",
+      "class": "read", "surface": "cloudflare",
+      "params": {},
+      "result_schema": ["result[].id", "result[].created_on"] },
+
+    { "id": "cloudflare.worker.describe",
+      "class": "read", "surface": "cloudflare",
+      "params": { "account_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+                  "worker":     { "type": "string", "pattern": "^[a-z0-9-]{1,54}$" } },
+      "result_schema": ["result.id", "result.etag", "result.modified_on"] },
+
+    { "id": "neon.database.describe",
+      "class": "read", "surface": "neon",
+      "params": { "project": { "type": "string", "pattern": "^[a-z0-9-]{1,64}$" } },
+      "result_schema": ["databases[].name", "databases[].owner_name"] },
+
+    { "id": "github.repo.describe",
+      "class": "read", "surface": "github",
+      "params": { "repo": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}/[A-Za-z0-9._-]{1,64}$" } },
+      "result_schema": ["full_name", "default_branch", "private", "pushed_at"] },
+
+    { "id": "github.pr.describe",
+      "class": "read", "surface": "github",
+      "params": { "repo":   { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}/[A-Za-z0-9._-]{1,64}$" },
+                  "number": { "type": "integer", "min": 1, "max": 1000000 } },
+      "result_schema": ["number", "state", "head_sha", "mergeable"] },
+
+    { "id": "supabase.project.list",
+      "class": "read", "surface": "supabase",
+      "params": {},
+      "result_schema": ["projects[].id", "projects[].name", "projects[].region"] },
+
+    { "id": "netlify.site.list",
+      "class": "read", "surface": "netlify",
+      "params": {},
+      "result_schema": ["sites[].id", "sites[].name"] },
+
+    { "id": "github.branch.push",
+      "class": "propose", "surface": "github",
+      "params": { "repo":     { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}/[A-Za-z0-9._-]{1,64}$" },
+                  "branch":   { "type": "string", "pattern": "^(feat|fix|chore|docs|loop|agent)/[A-Za-z0-9._/-]{1,80}$" },
+                  "head_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+                  "bundle":   { "type": "staged-blob", "max_bytes": 20971520 } },
+      "invariants": ["not_default_branch", "no_deploy_sensitive_paths",
+                     "fast_forward_or_new_ref", "ci_safe"],
+      "result_schema": ["ref", "head_sha", "files_changed"] },
+
+    { "id": "github.pr.create",
+      "class": "propose", "surface": "github",
+      "params": { "repo":  { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}/[A-Za-z0-9._-]{1,64}$" },
+                  "head":  { "type": "string", "pattern": "^(feat|fix|chore|docs|loop|agent)/[A-Za-z0-9._/-]{1,80}$" },
+                  "base":  { "type": "string", "pattern": "^[A-Za-z0-9._/-]{1,80}$" },
+                  "title": { "type": "prose", "max_len": 120 },
+                  "body":  { "type": "prose", "max_len": 8000 } },
+      "invariants": ["base_is_default_branch", "review_receipt_fresh_for_head_sha"],
+      "result_schema": ["number", "html_url"] },
+
+    { "id": "cloudflare.worker.deploy",
+      "class": "write", "surface": "cloudflare", "approval": "human",
+      "records_ownership": true,
+      "params": { "account_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+                  "worker":     { "type": "string", "pattern": "^[a-z0-9-]{1,54}$" },
+                  "bundle_sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+      "state_probe": { "op": "cloudflare.worker.describe",
+                       "map": { "account_id": "account_id", "worker": "worker" } },
+      "result_schema": ["result.id", "result.etag", "result.modified_on"] },
+
+    { "id": "github.pr.merge",
+      "class": "write", "surface": "github", "approval": "human",
+      "records_ownership": false,
+      "params": { "repo":   { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}/[A-Za-z0-9._-]{1,64}$" },
+                  "number": { "type": "integer", "min": 1, "max": 1000000 },
+                  "method": { "type": "string", "pattern": "^(merge|squash|rebase)$" } },
+      "state_probe": { "op": "github.pr.describe",
+                       "map": { "repo": "repo", "number": "number" } },
+      "result_schema": ["merged", "sha"] }
+  ]
+}

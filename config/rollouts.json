@@ -1,0 +1,27 @@
+{
+  "schema": "stack-rollouts/v1",
+  "rollouts": [
+    {
+      "id": "adr-086-self-update-hooks",
+      "title": "Self-update stager + applier hooks wired",
+      "since_stack_version": "1.9.0",
+      "applies_to": { "config_dirs": "all" },
+      "probes": [
+        { "type": "file_present", "path": "hooks/stack-self-update.sh" },
+        { "type": "file_present", "path": "hooks/stack-update-apply.sh" },
+        { "type": "settings_json", "jq": "[.hooks.SessionStart[].hooks[].command] | any(test(\"stack-self-update\"))" },
+        { "type": "settings_json", "jq": "[.hooks.UserPromptSubmit[].hooks[].command] | any(test(\"stack-update-apply\"))" },
+        { "type": "file_present", "path": "hooks/stack-update.pin.json" }
+      ]
+    },
+    {
+      "id": "adr-087-floor-protects-attest",
+      "title": "Managed floor denyWrite covers state/attest/**",
+      "since_stack_version": "1.10.0",
+      "applies_to": { "config_dirs": "master" },
+      "probes": [
+        { "type": "floor_glob", "glob": "~/.claude/state/attest/**" }
+      ]
+    }
+  ]
+}

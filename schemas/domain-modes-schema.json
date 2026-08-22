@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/domain-modes-schema.json",
+  "title": "Domain Modes",
+  "description": "ADR-053: schema for config/domain-modes.json. Domain-specific routing rules read by foreman step 6 and scripts/verify.sh.",
+  "type": "object",
+  "required": ["version", "modes"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": { "type": "string" },
+    "stage_order": {
+      "type": "array",
+      "description": "ADR-053 D9: canonical subagent ordering used to insert mode-forced agents into a task-type chain without reordering existing members. Governs insertion of NEW agents only.",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": { "type": "string" },
+          "required_subagents_for_change": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "required_skills": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "approval_gates": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "suggested_paths": {
+            "type": "array",
+            "description": "ADR-053 D3: pre-fill offered by /project-init and /domain-mode for domain_mode_paths[<mode>]. Never read at routing or permission-compile time.",
+            "items": { "type": "string" }
+          },
+          "rationale": { "type": "string" },
+          "validator_must_cross_check": { "type": "boolean" },
+          "require_adr": { "type": "boolean" },
+          "require_rollback_plan": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

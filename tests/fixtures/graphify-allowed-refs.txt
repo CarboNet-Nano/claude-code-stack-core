@@ -1,0 +1,48 @@
+- Either way, `mkdir -p .claude && touch .claude/.graphify-init-done` so it
+- Gate: skip silently if `.claude/.graphify-init-done` exists, OR
+- Otherwise run `/graphify-init` once and print one line in the boot
+- This step never invokes `/graphify-extract` — ADR-054 D1/D12's
+.claude/.graphify-init-done
+.claude/graphify/
+"graphify": "ADR-054: skills/graphify-init/SKILL.md and skills/graphify-extract/SKILL.md are copy-only, same shape as user_docs_runner and logic_extraction_scripts — no hard `requirements[]` entry for python3/pip/venv, since a Tier-3 install must not fail on a machine that never runs graphify. The pinned shared venv (graphifyy[gemini,sql]==0.9.32) at ~/.claude/tools/graphify/.venv is created lazily by /graphify-init's own preflight on first use, never shipped by the installer. The backend key is covered by this manifest's existing GEMINI_API_KEY advisory_smoke_test above — no new entry needed. D4's V1 (does `graphify extract --code-only`'s report count include non-code files, or only parsed code files?) and V2 (does the discovery walk honour .gitignore?) are REQUIRED one-time empirical verifications before the metered full-extraction path may be trusted in any environment, per ADR-054 D4. **RUN 2026-08-01** against this repo (claude-code-stack, doc-heavy anchor) using graphifyy 0.9.32 in the pinned venv at ~/.claude/tools/graphify/.venv, `graphify extract . --code-only --no-cluster`. Verbatim stdout: `[graphify extract] --code-only: skipping 359 non-code file(s) (359 docs, 0 papers, 0 images) — no LLM extraction` then `[graphify extract] found 165 code, 0 docs, 0 papers, 0 images` (12 more files unclassified/skipped), then `wrote .../graph.json — 2360 nodes, 3031 edges`. **V1 result: the report counts ONLY parsed code files (165), not the full file-discovery-walk total (524) — it reports code and non-code counts as two separate numbers, never conflated.** This is the second branch in D4's V1 decision rule: step 4's projection basis falls back to the step-3a ECS enumeration (`git ls-files -z --cached --others --exclude-standard`) rather than this report's own code count, and D5's calibration-band label must note the denominator is a git inventory, not graphify's own report. **V2 result: CONFIRMED — the discovery walk honours .gitignore.** A canary file (`tools/graphify/__pycache__/canary_module.py`, real Python class+function content, sitting inside a directory matched by this repo's own `__pycache__/` gitignore rule, confirmed ignored via `git check-ignore -v`) was placed before the run and searched for after: zero occurrences of `canary` or `__pycache__` in either `manifest.json` (165 entries, exactly the parsed-code count, no canary) or `graph.json` (2360 nodes, 3031 edges, grep for both strings returns 0 hits). The walk never reached the canary. This proves `dispatch ⊆ ECS` holds for this graphify version/config, so D6's egress heuristic is sound and step 3a stands as written — the metered full-extraction path in `/graphify-extract` is CLEARED to run against real repos, D4's precondition satisfied. Canary file and temp output directory were deleted after the run; nothing from this verification is tracked in git. This --code-only run performed no LLM dispatch (per `graphify --help`: \"index code (local AST, no API key)\"), so no cost/tokens were incurred and no `calibration.jsonl` entry applies — V1/V2 are structural verifications, not calibration runs."
+"test -f ~/.claude/skills/graphify-extract/SKILL.md",
+"test -f ~/.claude/skills/graphify-init/SKILL.md",
+"test -f ~/.claude/tools/graphify/requirements.txt"
+{ "from": "skills/graphify-extract/SKILL.md", "to": "~/.claude/skills/graphify-extract/SKILL.md" },
+{ "from": "skills/graphify-init/SKILL.md",    "to": "~/.claude/skills/graphify-init/SKILL.md" },
+{ "from": "tools/graphify/requirements.txt",  "to": "~/.claude/tools/graphify/requirements.txt" }
+"id": "graphify-extract",
+"id": "graphify-init",
+"natural_language": "build or refresh this repo's graphify knowledge graph"
+"natural_language": "one-time, free, idempotent setup of the graphify knowledge-graph tool for this repo"
+"slash": "/graphify-extract",
+"slash": "/graphify-init",
+"summary": "Build or refresh this repo's graphify knowledge graph.",
+"summary": "One-time, free, idempotent setup of the graphify knowledge-graph tool for this repo.",
+**Set up graphify (Tier 3+, ADR-054 D11, amended 2026-08-01).** Once,
+/graphify-extract (costs money, asks first)." On any error from
+# graphify (ADR-054) — regenerable, large, contains source excerpts. Never commit.
+`.graphify-init-done` the once-per-repo graphify auto-setup marker written
+`/graphify-extract` — building a graph stays a separate, always-manual,
+`/graphify-init`, print what failed instead — never block the boot.
+`~/.claude/tools/graphify/.venv` (global, not repo state) and relies on
+`~/.claude/tools/graphify/requirements.txt` is absent (stack hasn't been
+`~/.claude/tools/graphify/requirements.txt` is present. If either check
+2. Run `/graphify-init` (free, setup-only per ADR-054 D3) — no confirmation
+3. Print one line reporting what happened: "graphify set up — index this
+4. `mkdir -p .claude && touch .claude/.graphify-init-done` so `/goodmorning`'s
+always-cost-gated call (ADR-054 D1/D12) — and since `/graphify-init`
+by the graphify setup step below and `/goodmorning`'s catch-up step, the
+error `/graphify-init` itself surfaces falls through to the commit step
+error from `/graphify-init` itself, print what failed instead.
+For repos that ran `/project-init` before `/project-init`'s own graphify
+graphify-out/
+repo anytime with /graphify-extract (costs money, asks first)." On any
+setup step existed. Not a prompt — `/graphify-init` is free, local-only,
+summary: "Set up graphify for this repo — index it anytime with
+updated to ship graphify on this machine yet).
+# Advisory graphify consult (ADR-054) — zero-cost local lookup, never trusted
+# alone. A negative graphify result never overrides a real grep.
+if [[ -f "$REPO/.claude/graphify/receipt.json" ]] && command -v graphify >/dev/null 2>&1; then
+EDGES="$(cd "$REPO" && graphify query "$TARGET" 2>/dev/null | jq -r 'length' 2>/dev/null || echo 0)"
+| 6e-2 | graphify catch-up | run | skip |

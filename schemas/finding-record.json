@@ -1,0 +1,194 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/finding-record.json",
+  "title": "Finding Record",
+  "description": "finding-record/v1 (stack ADR-078 spec S5.2). The shared, append-only record every Sweep check emits and every downstream consumer (renderer, roster-keeper, agent audit) reads. No finding-record field may ever contain a database cell value, credential, or personal identifier (G8) - enforced by sweep-emit.sh, not by this schema alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "finding_id",
+    "identity_key",
+    "run_id",
+    "repo",
+    "created_at",
+    "what",
+    "plain",
+    "mechanism",
+    "surface",
+    "surface_source",
+    "found_by",
+    "evidence",
+    "liveness",
+    "responsible_agent",
+    "roster_action"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["finding-record/v1"],
+      "description": "Schema identifier and version tag for this record. Always the literal string finding-record/v1."
+    },
+    "finding_id": {
+      "type": "string",
+      "description": "finding_id = sha256(repo + check_id + mechanism + normalized_locus + identity_key)[:16]. Deterministic so the same underlying defect re-emits the same id across runs (dedup key). what is NEVER hashed."
+    },
+    "identity_key": {
+      "type": "string",
+      "description": "The stable name of the thing this finding is about (e.g. a field, a route, a check id). Must NOT match a UUID, an ISO-8601 timestamp, or a 4+ digit run number - those are run identity, not finding identity."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Composite identifier for the Sweep run that produced this record (UTC start timestamp + short commit sha or equivalent)."
+    },
+    "repo": {
+      "type": "string",
+      "description": "The repository this finding was produced against."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO-8601 timestamp of when this finding record was emitted."
+    },
+    "what": {
+      "type": "string",
+      "description": "Technical, mechanistic description of the defect - the evidence a reviewer needs to confirm the finding is real."
+    },
+    "plain": {
+      "type": "string",
+      "description": "Exactly one plain-English sentence describing user-visible impact. No check ids, no family letters (sweep-family-A etc.), no .ts/file paths (spec S4.6 G2 wording)."
+    },
+    "mechanism": {
+      "type": "string",
+      "enum": [
+        "DISCONNECTED",
+        "MISSING GUARD",
+        "CONTRACT DRIFT",
+        "NEVER RAN",
+        "WRONG VALUE",
+        "WRONG SCOPE",
+        "DATA STATE"
+      ],
+      "description": "The category of failure mechanism this finding represents."
+    },
+    "surface": {
+      "enum": [
+        "write-path",
+        "read-path",
+        "schema",
+        "ci-gate",
+        "ui-route",
+        "scheduled-job",
+        "external-integration",
+        "scale",
+        "docs",
+        null
+      ],
+      "description": "The system surface affected. null when surface_source is unset (e.g. a human-walkthrough finding that has not been classified yet)."
+    },
+    "surface_source": {
+      "type": "string",
+      "enum": ["declared", "unset"],
+      "description": "Whether surface was declared by the emitting check (declared) or left unclassified (unset)."
+    },
+    "found_by": {
+      "type": "string",
+      "enum": [
+        "human-walkthrough",
+        "prod-audit",
+        "code-review",
+        "accident",
+        "ci-self-audit",
+        "incident",
+        "test",
+        "sweep-family-A",
+        "sweep-family-B",
+        "sweep-family-C",
+        "sweep-family-D",
+        "sweep-family-E",
+        "sweep-family-F",
+        "sweep-family-G"
+      ],
+      "description": "The mechanism or check family that surfaced this finding."
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["measurement"],
+      "anyOf": [
+        { "required": ["commit"] },
+        { "required": ["locus"] }
+      ],
+      "description": "The verifiable basis for this finding. At least one of commit or locus is required.",
+      "properties": {
+        "commit": {
+          "type": "string",
+          "description": "The commit sha this finding's evidence was gathered against."
+        },
+        "locus": {
+          "type": "string",
+          "description": "The file:line or equivalent location the evidence points to."
+        },
+        "measurement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["statement", "count", "denominator", "source"],
+          "description": "The quantified basis for this finding - what was counted, out of what, and how.",
+          "properties": {
+            "statement": {
+              "type": "string",
+              "description": "One-line description of what was counted."
+            },
+            "count": {
+              "type": "integer",
+              "description": "The number of instances found."
+            },
+            "denominator": {
+              "type": "integer",
+              "description": "The total population count was measured against."
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "static-source",
+                "generated-world",
+                "production-data",
+                "human"
+              ],
+              "description": "Where the measurement was gathered from."
+            }
+          }
+        }
+      }
+    },
+    "liveness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assertions_executed", "assertions_passed"],
+      "description": "Structural liveness invariant for the check that emitted this finding (spec S4.2). Proves the check actually ran and asserted something.",
+      "properties": {
+        "assertions_executed": {
+          "type": "integer",
+          "description": "Total number of assertions the emitting check executed this run."
+        },
+        "assertions_passed": {
+          "type": "integer",
+          "description": "Number of those assertions that passed."
+        }
+      }
+    },
+    "responsible_agent": {
+      "type": ["string", "null"],
+      "description": "The agent role identified as responsible for this class of defect, or null if not yet attributed. NEVER prompted from the user directly (roster-keeper's surface, decision 7)."
+    },
+    "roster_action": {
+      "enum": ["none", "prompt-change", "new-check", "new-agent", null],
+      "description": "The roster-keeper action this finding implies, or null if not yet triaged."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "fixed", "wontfix", "duplicate"],
+      "description": "Disposition of this finding. NOT present on check-emitted rows (spec S4.3) - only on disposition rows written after triage."
+    }
+  }
+}

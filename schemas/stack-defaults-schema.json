@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-defaults-schema.json",
+  "title": "Stack User Defaults",
+  "description": "User-global defaults for Claude Code Stack. Lives at ~/.claude/stack-defaults.json. Populated by install.sh, edited by /default-edit global.",
+  "type": "object",
+  "required": ["stack_version", "default_tier", "default_orchestration_mode", "default_strict_mode"],
+  "properties": {
+    "stack_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "user_name": { "type": "string" },
+    "user_email": { "type": "string", "format": "email" },
+    "additional_directories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths added to Claude Code's permissions.additionalDirectories"
+    },
+    "default_tier": { "type": "integer", "minimum": 0, "maximum": 5, "default": 4 },
+    "default_orchestration_mode": {
+      "type": "string",
+      "enum": ["main-thread", "agent-teams", "hybrid", "dynamic-workflows"],
+      "default": "main-thread"
+    },
+    "default_strict_mode": { "type": "boolean", "default": true },
+    "default_domain_mode": {
+      "description": "ADR-053: same oneOf as stack-config-schema.json's domain_mode -- a bare string (single-mode, unchanged) or an array (multi-mode default).",
+      "default": null,
+      "oneOf": [
+        {
+          "type": ["string", "null"],
+          "enum": ["financial-code", "schema-migration", "deploy", "ui-design", "data-operation", null]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["financial-code", "schema-migration", "deploy", "ui-design", "data-operation"]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      ]
+    },
+    "default_sensitivity_level": {
+      "type": "string",
+      "enum": ["normal", "sensitive", "confidential"],
+      "default": "normal"
+    },
+    "default_required_approvals": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["pre-merge", "pre-deploy", "pre-schema-change", "pre-bulk-job"]
+      },
+      "default": [],
+      "description": "Default for a fresh project's required_approvals (stack-config-schema.json). Empty array matches today's /project-init output — no gate is unconditionally forced by default, only the MCQ-2 baseline routine denies apply everywhere (scripts/permissions-compile.sh). Lets /project-init's \"also become your default for new projects?\" prompt (step 4) actually honor a yes answer for this setting, which it could not before (no slot existed to write to)."
+    },
+    "default_cost_protection": {
+      "type": "object",
+      "properties": {
+        "per_session_alert_usd": { "type": ["number", "null"], "minimum": 0, "default": 5.00 },
+        "per_day_alert_usd": { "type": ["number", "null"], "minimum": 0, "default": 50.00 },
+        "per_session_hard_cap_usd": { "type": ["number", "null"], "minimum": 0, "default": null }
+      }
+    },
+    "supabase": {
+      "type": "object",
+      "properties": {
+        "project_ref": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "providers": {
+      "type": "object",
+      "properties": {
+        "anthropic_key_keychain_item": { "type": "string" },
+        "openai_key_keychain_item": { "type": "string" },
+        "google_ai_key_keychain_item": { "type": "string" }
+      }
+    },
+    "review_pass": {
+      "type": "object",
+      "properties": {
+        "required_for_handoffs": { "type": "boolean", "default": true },
+        "required_for_specs": { "type": "boolean", "default": true },
+        "required_for_audit_reports": { "type": "boolean", "default": true },
+        "required_for_design_docs": { "type": "boolean", "default": true }
+      }
+    },
+    "session_prefs_defaults": {
+      "type": "object",
+      "description": "v1.2: User-level default session preferences. Fallback when a project has no session_prefs and no live session override. Same fields as stack-config session_prefs.",
+      "properties": {
+        "communication_style": { "type": "string", "enum": ["terse", "balanced", "thorough"], "default": "balanced" },
+        "model_effort": { "type": "string", "enum": ["minimal", "fast", "balanced", "thorough", "max"], "default": "balanced" },
+        "explanation_verbosity": { "type": "string", "enum": ["minimal", "normal", "teaching"], "default": "normal" },
+        "orchestration_mode": { "type": "string", "enum": ["main-thread", "agent-teams", "hybrid", "dynamic-workflows"] },
+        "cost_alert_sensitivity": { "type": "string", "enum": ["relaxed", "normal", "strict"], "default": "normal" },
+        "passive_suggest": { "type": "boolean", "default": true, "description": "When true, dispatch-nudge.sh appends a pointer to the recommend-capabilities engine." },
+        "simple_talk": { "type": "string", "enum": ["off", "plain", "caveman"], "default": "off", "description": "v1.3 (ADR-032): plainness modifier (off/plain/caveman), orthogonal to communication_style. Injected each turn by hooks/simple-talk.sh." },
+        "model_fit_receipt": { "type": "string", "enum": ["off", "on"], "default": "on", "description": "v1.3 (ADR-033): post-session model-fit receipt (off/on). on = print one retrospective end-of-session line; off = no receipt, no accrual." },
+        "auto_offer_loop": { "type": "boolean", "default": true, "description": "ADR-047: when true, hooks/loop-shape-nudge.sh asks (via AskUserQuestion) whether to run a loop-shaped request as a governed loop, once per session. Set false to silence the ask entirely." },
+        "auto_offer_advisor_pair": { "type": "boolean", "default": true, "description": "ADR-052: when true, hooks/advisor-pair-nudge.sh asks (via AskUserQuestion) to switch to the ladder-recommended advisor pairing whenever the effective model/advisorModel pair changes and no longer matches it. Set false to silence the ask entirely." }
+      },
+      "additionalProperties": false
+    },
+    "guards": {
+      "type": "object",
+      "description": "Rollout-mode defaults for the stack's own gate hooks, keyed by guard name. usage_check_gate (usage-check gate): off = no enforcement, warn = log-only (never blocks), on = blocking. Ships warn -- graduates to on only after real-world validation. review_gate (ADR-087 review-receipt gate, both G1/implementer-dispatch and G2/gh-pr-create mounts): same three-value vocabulary; ships warn in R1 -- see docs/ADRs/087-receipt-gates-and-fleet-scoreboard.md D6 for what warn must prove before anyone flips it to on. NOTE: 'machinery'-class denies (jq absent, config unparseable, empty disable file) block unconditionally regardless of this value -- only 'evidence-missing'-class denies are gated by warn/on (D5).",
+      "properties": {
+        "usage_check_gate": { "type": "string", "enum": ["off", "warn", "on"], "default": "warn" },
+        "review_gate": { "type": "string", "enum": ["off", "warn", "on"], "default": "warn" }
+      },
+      "additionalProperties": true
+    },
+    "tenant_pack": {
+      "type": "object",
+      "description": "M3 (ADR-034): the tenant pack composed over this install. Written by install.sh --pack after a successful compose.",
+      "required": ["tenant_id", "path"],
+      "properties": {
+        "tenant_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,62}$" },
+        "source": { "type": "string", "description": "Git URL or local path the pack was installed from." },
+        "ref": { "type": "string", "description": "Git ref requested at install time, if any." },
+        "pack_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "path": { "type": "string", "description": "Durable local copy: ~/.claude/packs/<tenant_id>." },
+        "installed_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

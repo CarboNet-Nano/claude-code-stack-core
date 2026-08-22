@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "groups": [
+    { "id": "start",     "title": "Start a session",  "members": ["goodmorning", "carbonet", "stack-help", "session", "suggest"] },
+    { "id": "plan",      "title": "Plan work",        "members": ["plan", "brainstorming", "grill-me", "adr", "dispatch", "foreman", "loop-engineer"] },
+    { "id": "ship",      "title": "Ship work",        "members": ["review-handoff", "validate-output", "pr-comments", "publish", "deploy-edge", "auto-merge", "new-migration"] },
+    { "id": "end",       "title": "End a session",    "members": ["carbonight", "handoff", "reflect"] },
+    { "id": "configure", "title": "Configure",        "members": ["project-init", "stack-config", "tier", "domain-mode", "strict-mode", "sensitivity", "cost-cap", "loop-level", "default-settings", "default-edit", "cloud-setup", "team-init", "alias"] },
+    { "id": "diagnose",  "title": "Diagnose",         "members": ["env-doctor", "operating", "handbook", "team-status", "todo", "cost-gate", "coverage-snapshot", "model-audit", "loop-review"] }
+  ],
+  "fallback_group": { "id": "more", "title": "More", "members": [] }
+}

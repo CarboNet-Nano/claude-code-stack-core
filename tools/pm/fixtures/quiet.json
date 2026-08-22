@@ -1,0 +1,23 @@
+{
+  "tracks": [
+    {
+      "track": "mvp-delivery",
+      "goal": "Ship core features",
+      "updated": "2026-08-08",
+      "blocked_on": "",
+      "prioritized": true
+    },
+    {
+      "track": "infra-upgrade",
+      "goal": "Modernize stack",
+      "updated": "2026-08-07",
+      "blocked_on": "",
+      "prioritized": false
+    }
+  ],
+  "counters": {
+    "staleCalls": 0,
+    "overridesByAgent": {},
+    "pendingPredictions": 0
+  }
+}

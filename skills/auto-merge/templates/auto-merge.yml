@@ -1,0 +1,40 @@
+name: auto-merge
+
+# Enables GitHub auto-merge (squash) on every PR. The PR merges itself once
+# the required status checks pass. Installed by the /auto-merge skill.
+#
+# The merge is enabled AS THE org merge-bot GitHub App, not as the
+# workflow's own GITHUB_TOKEN. This is load-bearing, not cosmetic: GitHub
+# suppresses workflow triggers for events caused by GITHUB_TOKEN (the
+# recursion guard), so bot-token merges to main never fired the push
+# workflows — the Sweep's writer cadence never ran per-merge, and its B4
+# check honestly flagged every landing as never CI-tested. An App-minted
+# token has no such suppression: merges now trigger push workflows like a
+# human's would. App ID + private key are ORG secrets (MERGE_BOT_APP_ID /
+# MERGE_BOT_PRIVATE_KEY), visible to all repos, so new repos inherit this
+# with zero per-repo setup.
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  enable-auto-merge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Mint app token (merges must trigger downstream workflows)
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+
+      - name: Enable auto-merge as the app
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR_URL"

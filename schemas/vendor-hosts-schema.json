@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/vendor-hosts-schema.json",
+  "title": "Vendor Hosts",
+  "description": "ADR-071 D5/D6. The single source of truth read by scripts/sandbox-policy-compile.sh. Declares the closed set of AI-vendor hosts the compiler is allowed to add/remove from sandbox.network.allowedDomains, plus each host's clearance for the 'sensitive' sensitivity level. Structural validation mirrored inside the compiler's embedded validator; this file documents the same shape and is the reviewable spec.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "vendors"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "vendors": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/vendorEntry" }
+    }
+  },
+  "definitions": {
+    "vendorEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "vendor", "kind", "is_runtime", "cleared_at_sensitive", "reviewed_on", "terms_url", "why"],
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "Lowercase, no scheme, no port, no glob. Unique across the array (T-level invariant, checked by the compiler and by tests/test-vendor-host-policy.sh)."
+        },
+        "vendor": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": ["direct", "aggregator"]
+        },
+        "is_runtime": {
+          "type": "boolean",
+          "description": "True for exactly one host — the endpoint the session itself runs on (api.anthropic.com). Always allowed, at every sensitivity level."
+        },
+        "cleared_at_sensitive": {
+          "type": "boolean",
+          "description": "true REQUIRES a non-null reviewed_on and a non-empty terms_url (ADR-071 D5) -- a violation is treated as NOT cleared by the compiler and fails a CI hygiene test (T5)."
+        },
+        "reviewed_on": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 date the clearance was recorded, or null if never reviewed."
+        },
+        "terms_url": {
+          "type": ["string", "null"]
+        },
+        "why": { "type": "string" }
+      }
+    }
+  }
+}

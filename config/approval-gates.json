@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "gates": {
+    "pre-merge": {
+      "description": "Require human approval before merging PRs to main.",
+      "applies_to_task_types": ["feature", "bug", "refactor", "migration"],
+      "default_enabled_at_tier": 2,
+      "user_prompt": "Reviewer + validator are satisfied. Merge to main? [y/N]"
+    },
+    "pre-deploy": {
+      "description": "Require human approval before any production deploy.",
+      "applies_to_task_types": ["deploy"],
+      "default_enabled_at_tier": 2,
+      "user_prompt": "Pre-flight checks passed. Deploy <function> to production? [y/N]"
+    },
+    "pre-schema-change": {
+      "description": "Require human approval before any schema migration.",
+      "applies_to_task_types": ["migration"],
+      "default_enabled_at_tier": 2,
+      "user_prompt": "Migration dry-run passed. Apply <migration> to production? [y/N]"
+    },
+    "pre-bulk-job": {
+      "description": "Require human approval before bulk LLM jobs (>100 rows).",
+      "applies_to_task_types": ["bulk_job"],
+      "default_enabled_at_tier": 2,
+      "user_prompt": "Cost projection: $<X> for <N> rows. Proceed? [y/N]"
+    }
+  }
+}

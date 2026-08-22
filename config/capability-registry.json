@@ -1,0 +1,2421 @@
+{
+  "generated_at": "2026-08-21T23:07:33Z",
+  "stack_version": "1.3.1",
+  "capabilities": [
+    {
+      "id": "accessibility-auditor",
+      "kind": "subagent",
+      "summary": "Use for UI changes \u2014 new pages, new components, dashboard work.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use for UI changes \u2014 new pages, new components, dashboard work"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "adhd",
+      "kind": "skill",
+      "summary": "Parallel divergent ideation for coding agents.",
+      "invocation": {
+        "slash": "/adhd",
+        "natural_language": "parallel divergent ideation for coding agents"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": true
+    },
+    {
+      "id": "adr",
+      "kind": "skill",
+      "summary": "Create or update an Architecture Decision Record.",
+      "invocation": {
+        "slash": "/adr",
+        "natural_language": "create or update an Architecture Decision Record"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "advisor-pair-nudge",
+      "kind": "hook",
+      "summary": "Detects a model/advisorModel change since last seen this session and nudges toward the ladder-recommended pairing, unless auto_offer_advisor_pair is off.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/advisor-pair-nudge.sh",
+        "events": [
+          "UserPromptSubmit"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.team.template.json"
+        ]
+      }
+    },
+    {
+      "id": "agent-performance-review",
+      "kind": "skill",
+      "summary": "Run monthly to evaluate how each subagent has actually performed over the last 30 days.",
+      "invocation": {
+        "slash": "/agent-performance-review",
+        "natural_language": "run monthly to evaluate how each subagent has actually performed over the last 30 days"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "agent-teams",
+      "kind": "skill",
+      "summary": "Shortcut to flip orchestration mode.",
+      "invocation": {
+        "slash": "/agent-teams",
+        "natural_language": "shortcut to flip orchestration mode"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "alias",
+      "kind": "skill",
+      "summary": "List the short names configured for this machine (like /hi or /docs) and explain who set one and why it does what it does.",
+      "invocation": {
+        "slash": "/alias",
+        "natural_language": "list the short names configured for this machine (like /hi or /docs) and explain who set one and why it does what it does"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "architect",
+      "kind": "subagent",
+      "summary": "Designs before code.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "designs before code"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "architecture-critic",
+      "kind": "subagent",
+      "summary": "Use AFTER architect on novel features, or for any architectural decision that locks the system into a direction.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use AFTER architect on novel features, or for any architectural decision that locks the system into a direction"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "auto-merge",
+      "kind": "skill",
+      "summary": "Per-repo opt-in for GitHub auto-merge gated on a required `run-tests` status check.",
+      "invocation": {
+        "slash": "/auto-merge",
+        "natural_language": "per-repo opt-in for GitHub auto-merge gated on a required `run-tests` status check"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "bare-agent-nudge",
+      "kind": "hook",
+      "summary": "Nudges toward /loop-engineer when a bare background Agent dispatch (no active loop) looks like an iterate-until-verified pattern.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/bare-agent-nudge.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Agent"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "brainstorming",
+      "kind": "skill",
+      "summary": "Diverge before you converge \u2014 generate and pressure-test multiple approaches before committing to one.",
+      "invocation": {
+        "slash": "/brainstorming",
+        "natural_language": "diverge before you converge \u2014 generate and pressure-test multiple approaches before committing to one"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "brevity-drift",
+      "kind": "hook",
+      "summary": "Injects a one-shot brevity correction when the assistant's last response blew its length budget.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/brevity-drift.sh",
+        "events": [
+          "UserPromptSubmit"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "brevity-reinforce",
+      "kind": "hook",
+      "summary": "Re-injects strict brevity rules at every SessionStart as a hard override above skill defaults.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/brevity-reinforce.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "broker-signpost",
+      "kind": "hook",
+      "summary": "Denies direct vendor CLI calls (wrangler/supabase/netlify/neonctl and gh write verbs) and points at stack-broker.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/broker-signpost.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "bulk-job-reminder",
+      "kind": "hook",
+      "summary": "Reminds about bulk-job safety and points to /cost-gate and /coverage-snapshot when Tier 1+ is installed.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/bulk-job-reminder.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "carbonet",
+      "kind": "skill",
+      "summary": "Check that everything is ready before you start working \u2014 that you're signed in, that your access is granted, that the stack is up to date, and that this folder is set up.",
+      "invocation": {
+        "slash": "/carbonet",
+        "natural_language": "check that everything is ready before you start working \u2014 that you're signed in, that your access is granted, that the stack is up to date, and that this folder is set up"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": true
+    },
+    {
+      "id": "carbonight",
+      "kind": "skill",
+      "summary": "Close out a working session \u2014 capture the session diff, run the touched tests, print a cost/model-fit receipt, flag doc drift, note one lesson, write a three-sentence plain-English summary, and hand off.",
+      "invocation": {
+        "slash": "/carbonight",
+        "natural_language": "close out a working session \u2014 capture the session diff, run the touched tests, print a cost/model-fit receipt, flag doc drift, note one lesson, write a three-sentence plain-English summary, and hand off"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": true
+    },
+    {
+      "id": "claude-api",
+      "kind": "skill",
+      "summary": "Reference for the Claude API / Anthropic SDK \u2014 model ids, pricing, params, streaming, tool use, MCP, agents, caching, token counting, model migration.",
+      "invocation": {
+        "slash": "/claude-api",
+        "natural_language": "reference for the Claude API / Anthropic SDK \u2014 model ids, pricing, params, streaming, tool use, MCP, agents, caching, token counting, model migration"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "claude-automation-recommender",
+      "kind": "skill",
+      "summary": "Analyze a codebase and recommend Claude Code automations (hooks, subagents, skills, plugins, MCP servers).",
+      "invocation": {
+        "slash": "/claude-automation-recommender",
+        "natural_language": "analyze a codebase and recommend Claude Code automations (hooks, subagents, skills, plugins, MCP servers)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "cloud-setup",
+      "kind": "skill",
+      "summary": "Print the one-time setup script that enables the stack's skills/commands in Claude Code cloud sessions (web + iOS) for a given environment.",
+      "invocation": {
+        "slash": "/cloud-setup",
+        "natural_language": "print the one-time setup script that enables the stack's skills/commands in Claude Code cloud sessions (web + iOS) for a given environment"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "config",
+      "kind": "skill",
+      "summary": "Forwarding stub.",
+      "invocation": {
+        "slash": "/config",
+        "natural_language": "forwarding stub"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": false
+    },
+    {
+      "id": "config-change-flag",
+      "kind": "hook",
+      "summary": "Flags config-file drift against a stored sha256 baseline and logs an audit row; never blocks the change.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/config-change-flag.sh",
+        "events": [
+          "ConfigChange"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "cost-cap",
+      "kind": "skill",
+      "summary": "Shortcut to set per-session and per-day cost protection.",
+      "invocation": {
+        "slash": "/cost-cap",
+        "natural_language": "shortcut to set per-session and per-day cost protection"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "cost-gate",
+      "kind": "skill",
+      "summary": "Run before any bulk LLM job (>100 rows or any LLM-per-row script).",
+      "invocation": {
+        "slash": "/cost-gate",
+        "natural_language": "run before any bulk LLM job (>100 rows or any LLM-per-row script)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "coverage-snapshot",
+      "kind": "skill",
+      "summary": "Run before any bulk data operation that updates existing rows (enrichment, backfill, migration).",
+      "invocation": {
+        "slash": "/coverage-snapshot",
+        "natural_language": "run before any bulk data operation that updates existing rows (enrichment, backfill, migration)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "data-engineer",
+      "kind": "subagent",
+      "summary": "Use for schema design, migrations, idempotency design, data quality, ETL/ELT pipelines, normalization/denormalization decisions.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use for schema design, migrations, idempotency design, data quality, ETL/ELT pipelines, normalization/denormalization decisions"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "default-edit",
+      "kind": "skill",
+      "summary": "Interactive editor for stack configuration.",
+      "invocation": {
+        "slash": "/default-edit",
+        "natural_language": "interactive editor for stack configuration"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "default-settings",
+      "kind": "skill",
+      "summary": "Read-only view of stack configuration.",
+      "invocation": {
+        "slash": "/default-settings",
+        "natural_language": "read-only view of stack configuration"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "deploy-edge",
+      "kind": "skill",
+      "summary": "Deploy a Supabase edge function with all guardrails.",
+      "invocation": {
+        "slash": "/deploy-edge",
+        "natural_language": "deploy a Supabase edge function with all guardrails"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "design-gate",
+      "kind": "hook",
+      "summary": "Denies Edit/Write on source files unless an approved design marker exists, only when ultracode is ON.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/design-gate.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Edit|Write|MultiEdit"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "design-match",
+      "kind": "skill",
+      "summary": "Match UI implementation to a design prototype.",
+      "invocation": {
+        "slash": "/design-match",
+        "natural_language": "match UI implementation to a design prototype"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "designer",
+      "kind": "subagent",
+      "summary": "Visual + system design.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "visual + system design"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "dispatch",
+      "kind": "skill",
+      "summary": "Manually dispatch a task to a specific subagent team.",
+      "invocation": {
+        "slash": "/dispatch",
+        "natural_language": "manually dispatch a task to a specific subagent team"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "dispatch-nudge",
+      "kind": "hook",
+      "summary": "Nudges the user toward /foreman or /dispatch when a prompt looks multi-step.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/dispatch-nudge.sh",
+        "events": [
+          "UserPromptSubmit"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "documenter",
+      "kind": "subagent",
+      "summary": "Writes/updates docs in parallel with implementer.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "writes/updates docs in parallel with implementer"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "domain-mode",
+      "kind": "skill",
+      "summary": "Shortcut to set the project's domain mode(s).",
+      "invocation": {
+        "slash": "/domain-mode",
+        "natural_language": "shortcut to set the project's domain mode(s)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "effort-eval",
+      "kind": "skill",
+      "summary": "Measure whether a subagent's reasoning-effort baseline (ADR-056) is actually worth its cost.",
+      "invocation": {
+        "slash": "/effort-eval",
+        "natural_language": "measure whether a subagent's reasoning-effort baseline (ADR-056) is actually worth its cost"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "env-doctor",
+      "kind": "skill",
+      "summary": "Diagnose a broken or unfamiliar dev environment before you start work.",
+      "invocation": {
+        "slash": "/env-doctor",
+        "natural_language": "diagnose a broken or unfamiliar dev environment before you start work"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "estimator",
+      "kind": "subagent",
+      "summary": "Use before starting non-trivial work to estimate effort, cost, and risk.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use before starting non-trivial work to estimate effort, cost, and risk"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "eval-bump",
+      "kind": "skill",
+      "summary": "Improve evaluation suites (golden sets, classifiers, NL\u2192SQL accuracy).",
+      "invocation": {
+        "slash": "/eval-bump",
+        "natural_language": "improve evaluation suites (golden sets, classifiers, NL\u2192SQL accuracy)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "foreman",
+      "kind": "skill",
+      "summary": "The orchestrator.",
+      "invocation": {
+        "slash": "/foreman",
+        "natural_language": "the orchestrator"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "foreman-team-lead",
+      "kind": "subagent",
+      "summary": "Team-lead subagent for Anthropic's Agent Teams orchestration mode.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "team-lead subagent for Anthropic's Agent Teams orchestration mode"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "git-safety-net",
+      "kind": "skill",
+      "summary": "Audits, preserves, recovers, and safely retires local Git state: unpushed or wrong-branch commits, dirty or detached worktrees, forgotten duplicate clones of the same repo, untracked work no bundle can back up, orphaned stashes, dangling commits, stale branches, and squash/rebase merge uncertainty.",
+      "invocation": {
+        "slash": "/git-safety-net",
+        "natural_language": "audits, preserves, recovers, and safely retires local Git state: unpushed or wrong-branch commits, dirty or detached worktrees, forgotten duplicate clones of the same repo, untracked work no bundle can back up, orphaned stashes, dangling commits, stale branches, and squash/rebase merge uncertainty"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "goodmorning",
+      "kind": "skill",
+      "summary": "Boot a Claude Code session with full context.",
+      "invocation": {
+        "slash": "/goodmorning",
+        "natural_language": "boot a Claude Code session with full context"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "graphify-extract",
+      "kind": "skill",
+      "summary": "Build or refresh this repo's graphify knowledge graph.",
+      "invocation": {
+        "slash": "/graphify-extract",
+        "natural_language": "build or refresh this repo's graphify knowledge graph"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "graphify-init",
+      "kind": "skill",
+      "summary": "One-time, free, idempotent setup of the graphify knowledge-graph tool for this repo.",
+      "invocation": {
+        "slash": "/graphify-init",
+        "natural_language": "one-time, free, idempotent setup of the graphify knowledge-graph tool for this repo"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "grill-me",
+      "kind": "skill",
+      "summary": "Relentless Socratic interrogation of a plan or design, run AFTER /plan produces a written plan and BEFORE the user approves it.",
+      "invocation": {
+        "slash": "/grill-me",
+        "natural_language": "relentless Socratic interrogation of a plan or design, run AFTER /plan produces a written plan and BEFORE the user approves it"
+      },
+      "tier_min": 1,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "grilling",
+      "kind": "skill",
+      "summary": "Grill the user one question at a time about a plan, decision, or idea \u2014 each as multiple choice with a recommendation.",
+      "invocation": {
+        "slash": "/grilling",
+        "natural_language": "grill the user one question at a time about a plan, decision, or idea \u2014 each as multiple choice with a recommendation"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "guard-check",
+      "kind": "hook",
+      "summary": "Runs a project's guards.script on Edit/Write/MultiEdit when the file matches guards.paths; exit 2 relays a real guard failure.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/guard-check.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Edit|Write|MultiEdit"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "handbook",
+      "kind": "skill",
+      "summary": "Read the stack handbook, or build its generated pages from source.",
+      "invocation": {
+        "slash": "/handbook",
+        "natural_language": "read the stack handbook, or build its generated pages from source"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "handoff",
+      "kind": "skill",
+      "summary": "Pointer only.",
+      "invocation": {
+        "slash": "/handoff",
+        "natural_language": "pointer only"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": false
+    },
+    {
+      "id": "handoff-guard",
+      "kind": "hook",
+      "summary": "Denies direct Write/Edit of handoff files; session-close.sh handoff-write is the only writer.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/handoff-guard.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Edit|Write|MultiEdit"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "historian",
+      "kind": "subagent",
+      "summary": "Use periodically (monthly, or on demand) to read all archived handoffs + ADRs + postmortems + cost logs and surface patterns.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use periodically (monthly, or on demand) to read all archived handoffs + ADRs + postmortems + cost logs and surface patterns"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "implementer",
+      "kind": "subagent",
+      "summary": "Writes code to match the architect's handoff packet.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "writes code to match the architect's handoff packet"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "incident-commander",
+      "kind": "subagent",
+      "summary": "Use when production is broken.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use when production is broken"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "integration-specialist",
+      "kind": "subagent",
+      "summary": "Use when working with external APIs \u2014 Pipedream, accounting APIs, Twilio, Slack, OpenAI/Anthropic/Google APIs, Stripe, anything with a vendor SDK.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use when working with external APIs \u2014 Pipedream, accounting APIs, Twilio, Slack, OpenAI/Anthropic/Google APIs, Stripe, anything with a vendor SDK"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "irreversible-deny",
+      "kind": "hook",
+      "summary": "Denies irreversible bash commands (push, merge, deploy, rm -rf) during an active loop.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/irreversible-deny.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "librarian",
+      "kind": "subagent",
+      "summary": "Curates the stack itself \u2014 deprecates stale skills, consolidates overlapping ones, updates skill descriptions for better triggering, surfaces unused subagents.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "curates the stack itself \u2014 deprecates stale skills, consolidates overlapping ones, updates skill descriptions for better triggering, surfaces unused subagents"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "live-capability-snapshot",
+      "kind": "hook",
+      "summary": "Writes a redacted per-machine snapshot of enabled plugins/MCP servers for the recommend-capabilities engine.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/live-capability-snapshot.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.team.template.json"
+        ]
+      }
+    },
+    {
+      "id": "local-ops",
+      "kind": "subagent",
+      "summary": "Variant of ops for tasks where data must NOT leave the laptop \u2014 sensitive financial exports, prod data inspection, anything user marks confidential.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "variant of ops for tasks where data must NOT leave the laptop \u2014 sensitive financial exports, prod data inspection, anything user marks confidential"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "loop-cost-accrual",
+      "kind": "hook",
+      "summary": "Records real per-tool token cost as a subagent-runs.jsonl row while a loop is active.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/loop-cost-accrual.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Agent|Workflow"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "loop-cost-monitor",
+      "kind": "hook",
+      "summary": "Denies a tool call mid-loop once the active loop's per-run cost budget is exhausted.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/loop-cost-monitor.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Agent",
+          "Bash",
+          "Workflow"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "loop-engineer",
+      "kind": "skill",
+      "summary": "Set up a governed autonomous loop.",
+      "invocation": {
+        "slash": "/loop-engineer",
+        "natural_language": "set up a governed autonomous loop"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "loop-level",
+      "kind": "skill",
+      "summary": "Shortcut to view or change the project's loop autonomy level (L1-L4).",
+      "invocation": {
+        "slash": "/loop-level",
+        "natural_language": "shortcut to view or change the project's loop autonomy level (L1-L4)"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "loop-review",
+      "kind": "skill",
+      "summary": "Review governed-loop telemetry and propose cap calibration.",
+      "invocation": {
+        "slash": "/loop-review",
+        "natural_language": "review governed-loop telemetry and propose cap calibration"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "loop-shape-nudge",
+      "kind": "hook",
+      "summary": "Each session, nudges toward a governed-loop ask when a prompt looks like iterate-until-verified work, unless auto_offer_loop is off.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/loop-shape-nudge.sh",
+        "events": [
+          "UserPromptSubmit"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "loop-stop",
+      "kind": "hook",
+      "summary": "Blocks the session from stopping while an active loop's goal is unmet and bounds remain, fail-closed to allowing the stop.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/loop-stop.sh",
+        "events": [
+          "Stop"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "mcp-cli",
+      "kind": "skill",
+      "summary": "On-demand MCP tool discovery \u2014 enumerate configured MCP servers and load only the tools a task needs, instead of preloading every server's full tool/resource/prompt set into context.",
+      "invocation": {
+        "slash": "/mcp-cli",
+        "natural_language": "on-demand MCP tool discovery \u2014 enumerate configured MCP servers and load only the tools a task needs, instead of preloading every server's full tool/resource/prompt set into context"
+      },
+      "tier_min": 1,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "migration-guard",
+      "kind": "hook",
+      "summary": "Adds friction (ask/deny) on editing a migration file already committed to the default branch.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/migration-guard.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Edit|Write|MultiEdit"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "model-audit",
+      "kind": "skill",
+      "summary": "Run monthly (or on demand) to audit subagent model assignments against current benchmarks and pricing.",
+      "invocation": {
+        "slash": "/model-audit",
+        "natural_language": "run monthly (or on demand) to audit subagent model assignments against current benchmarks and pricing"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "model-eval",
+      "kind": "skill",
+      "summary": "Measure whether a subagent's assigned MODEL is the right one, by running the same golden tasks across models, effort levels, and advisor pairings and scoring blind with the cross-family judge.",
+      "invocation": {
+        "slash": "/model-eval",
+        "natural_language": "measure whether a subagent's assigned MODEL is the right one, by running the same golden tasks across models, effort levels, and advisor pairings and scoring blind with the cross-family judge"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "model-fit-turn",
+      "kind": "hook",
+      "summary": "Accrues per-turn token usage on Stop and prints a once-per-session model-fit receipt.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/model-fit-turn.sh",
+        "events": [
+          "Stop"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.team.template.json"
+        ]
+      }
+    },
+    {
+      "id": "native-settings-edit",
+      "kind": "skill",
+      "summary": "The ONLY writer of Claude Code native settings.json.",
+      "invocation": {
+        "slash": "/native-settings-edit",
+        "natural_language": "the ONLY writer of Claude Code native settings.json"
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": false
+    },
+    {
+      "id": "new-migration",
+      "kind": "skill",
+      "summary": "Create the next forward-only database migration \u2014 resolves the project's migrations directory, picks the next sequence number, detects collisions with sibling branches, writes from a template, and renders the project's declared RLS / tenant-scoping checklist.",
+      "invocation": {
+        "slash": "/new-migration",
+        "natural_language": "create the next forward-only database migration \u2014 resolves the project's migrations directory, picks the next sequence number, detects collisions with sibling branches, writes from a template, and renders the project's declared RLS / tenant-scoping checklist"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "operating",
+      "kind": "skill",
+      "summary": "Show how to operate Claude Code with the stack \u2014 what you actively do (/goodmorning, /carbonight, /project-init, /budget-guard), what happens automatically (foreman orchestration, domain-mode review, approval gates), the per-repo tier/domain table, and where ADRs/runbooks live.",
+      "invocation": {
+        "slash": "/operating",
+        "natural_language": "show how to operate Claude Code with the stack \u2014 what you actively do (/goodmorning, /carbonight, /project-init, /budget-guard), what happens automatically (foreman orchestration, domain-mode review, approval gates), the per-repo tier/domain table, and where ADRs/runbooks live"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "ops",
+      "kind": "subagent",
+      "summary": "Owns deploy verification, MCP health checks, secret rotation reminders, cost-log queries.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "owns deploy verification, MCP health checks, secret rotation reminders, cost-log queries"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "override-log",
+      "kind": "hook",
+      "summary": "Logs subagent dispatches made in high-sensitivity project contexts for audit purposes.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/override-log.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Agent"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json"
+        ]
+      }
+    },
+    {
+      "id": "performance-engineer",
+      "kind": "subagent",
+      "summary": "Use for query plan reasoning, N+1 detection, RPC perf, index design, LATERAL JOIN evaluation, dashboard load-time work.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "use for query plan reasoning, N+1 detection, RPC perf, index design, LATERAL JOIN evaluation, dashboard load-time work"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "permission-denied-log",
+      "kind": "hook",
+      "summary": "Logs classifier-driven PermissionDenied events into the shared override log via ovlog_append.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/permission-denied-log.sh",
+        "events": [
+          "PermissionDenied"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "plan",
+      "kind": "skill",
+      "summary": "Use BEFORE writing any code for non-trivial tasks (anything beyond a 1-line fix).",
+      "invocation": {
+        "slash": "/plan",
+        "natural_language": "use BEFORE writing any code for non-trivial tasks (anything beyond a 1-line fix)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "pm",
+      "kind": "subagent",
+      "summary": "The roster's judgment seat over the mechanical PM brief (tools/pm).",
+      "invocation": {
+        "slash": null,
+        "natural_language": "the roster's judgment seat over the mechanical PM brief (tools/pm)"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "portable-core-refresh",
+      "kind": "hook",
+      "summary": "Refreshes per-repo copies of portable-core skills whose bytes are provably an older stack version, so a repo initialised before a stack change stops being a silently stale fork (ADR-075).",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/portable-core-refresh.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "post-compact-verify",
+      "kind": "hook",
+      "summary": "Compares this session's post-compaction loop-state against the PreCompact snapshot; flags a mismatch loudly, never auto-reverts.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/post-compact-verify.sh",
+        "events": [
+          "PostCompact"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "post-tool-tsc",
+      "kind": "hook",
+      "summary": "Runs tsc --noEmit after a tool call in a TypeScript project, printing errors but never blocking.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/post-tool-tsc.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Edit|Write|MultiEdit"
+        ],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "pr-comments",
+      "kind": "skill",
+      "summary": "Posts reviewer/security-auditor findings (reviewer-report.md / security-report.md, or /code-review output) as inline GitHub PR review comments via `gh api`, so findings that currently only surface in conversation also land on the PR diff itself.",
+      "invocation": {
+        "slash": "/pr-comments",
+        "natural_language": "posts reviewer/security-auditor findings (reviewer-report.md / security-report.md, or /code-review output) as inline GitHub PR review comments via `gh api`, so findings that currently only surface in conversation also land on the PR diff itself"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "pre-compact-snapshot",
+      "kind": "hook",
+      "summary": "Snapshots this session's loop-state file to a sibling path before compaction, so PostCompact can detect corruption.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/pre-compact-snapshot.sh",
+        "events": [
+          "PreCompact"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "product-critic",
+      "kind": "subagent",
+      "summary": "Adversarially challenges WHAT is being built \u2014 not how.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "adversarially challenges WHAT is being built \u2014 not how"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "project-init",
+      "kind": "skill",
+      "summary": "Initialize a project for use with the Claude Code Stack.",
+      "invocation": {
+        "slash": "/project-init",
+        "natural_language": "initialize a project for use with the Claude Code Stack"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "publish",
+      "kind": "skill",
+      "summary": "Deploy the current project to Cloudflare, binding the tenant's Secrets Store secrets into wrangler.toml first so a missing/misconfigured secret hard-aborts the deploy instead of shipping without it (ADR-035).",
+      "invocation": {
+        "slash": "/publish",
+        "natural_language": "deploy the current project to Cloudflare, binding the tenant's Secrets Store secrets into wrangler.toml first so a missing/misconfigured secret hard-aborts the deploy instead of shipping without it (ADR-035)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "recommend-capabilities",
+      "kind": "skill",
+      "summary": "Core recommendation engine for stack capabilities.",
+      "invocation": {
+        "slash": "/recommend-capabilities",
+        "natural_language": "core recommendation engine for stack capabilities"
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": false
+    },
+    {
+      "id": "red-team",
+      "kind": "subagent",
+      "summary": "Actively tries to break things.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "actively tries to break things"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "reflect",
+      "kind": "skill",
+      "summary": "Post-task retrospective.",
+      "invocation": {
+        "slash": "/reflect",
+        "natural_language": "post-task retrospective"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "review-gate",
+      "kind": "hook",
+      "summary": "PreToolUse gate \u2014 blocks implementer dispatch (G1) / gh pr create (G2) without a fresh cross-family review receipt.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/review-gate.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Agent",
+          "Bash",
+          "Task"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "review-handoff",
+      "kind": "skill",
+      "summary": "Use BEFORE declaring any multi-artifact deliverable done.",
+      "invocation": {
+        "slash": "/review-handoff",
+        "natural_language": "use BEFORE declaring any multi-artifact deliverable done"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "review-receipt-mint",
+      "kind": "hook",
+      "summary": "Mints a review receipt from a genuine scripts/panel-review.sh run observed in Bash output.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/review-receipt-mint.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "reviewer",
+      "kind": "subagent",
+      "summary": "Adversarial cold-read of the diff before merge.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "adversarial cold-read of the diff before merge"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "rtk-rewrite",
+      "kind": "hook",
+      "summary": "Rewrites shell commands through RTK for token-compressed output.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/rtk-rewrite.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.tier-1.template.json"
+        ]
+      }
+    },
+    {
+      "id": "runbook",
+      "kind": "skill",
+      "summary": "Create or update an operational runbook.",
+      "invocation": {
+        "slash": "/runbook",
+        "natural_language": "create or update an operational runbook"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "sandbox-policy-recompile",
+      "kind": "hook",
+      "summary": "Recompiles the sandbox vendor-host policy when an Edit/Write actually changes sensitivity.level in stack-config.json (ADR-071 D9).",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/sandbox-policy-recompile.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Edit|Write|MultiEdit"
+        ],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "sandbox-policy-session-start",
+      "kind": "hook",
+      "summary": "Compiles the repo's sensitivity level into the sandbox network allowlist at session start (ADR-071).",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/sandbox-policy-session-start.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "schema-deploy-gate",
+      "kind": "hook",
+      "summary": "Gates schema migrations and production deploys behind human approval.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/schema-deploy-gate.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Bash",
+          "mcp__.*__(apply_migration|execute_sql|deploy_edge_function)"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json"
+        ]
+      }
+    },
+    {
+      "id": "scribe",
+      "kind": "subagent",
+      "summary": "At session end, composes the handoff document and hands it to session-close.sh to write and commit.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "at session end, composes the handoff document and hands it to session-close.sh to write and commit"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "security-auditor",
+      "kind": "subagent",
+      "summary": "Proactive security review.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "proactive security review"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "sensitivity",
+      "kind": "skill",
+      "summary": "Shortcut to set the project's data sensitivity level.",
+      "invocation": {
+        "slash": "/sensitivity",
+        "natural_language": "shortcut to set the project's data sensitivity level"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "session",
+      "kind": "skill",
+      "summary": "Set your communication and working preferences for this session via a multiple-choice menu.",
+      "invocation": {
+        "slash": "/session",
+        "natural_language": "set your communication and working preferences for this session via a multiple-choice menu"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "session-end-handoff-reminder",
+      "kind": "hook",
+      "summary": "Warns and logs at SessionEnd when uncommitted work or an active loop looks unfinished.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/session-end-handoff-reminder.sh",
+        "events": [
+          "SessionEnd"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "session-marker",
+      "kind": "hook",
+      "summary": "Write-once-per-logical-session marker so session start time survives resume/compact, unlike session-start.txt.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/session-marker.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "session-prefs-init",
+      "kind": "hook",
+      "summary": "Materializes the active session preferences into one file that other hooks and the assistant read.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/session-prefs-init.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "session-start-handoff",
+      "kind": "hook",
+      "summary": "Shows the stack status banner, warns if uninitialized, and auto-loads a pending session handoff at SessionStart.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/session-start-handoff.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "session-start-token-check",
+      "kind": "hook",
+      "summary": "Warns at SessionStart about tracked tokens expiring soon.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/session-start-token-check.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "simple-talk",
+      "kind": "hook",
+      "summary": "Injects a per-turn directive shaping how plainly the assistant writes, per the simple_talk session preference.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/simple-talk.sh",
+        "events": [
+          "UserPromptSubmit"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "stack-config",
+      "kind": "skill",
+      "summary": "Setup Dashboard \u2014 one read-first front door for your whole Claude Code setup (stack settings + native settings.json).",
+      "invocation": {
+        "slash": "/stack-config",
+        "natural_language": "setup Dashboard \u2014 one read-first front door for your whole Claude Code setup (stack settings + native settings.json)"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": false
+    },
+    {
+      "id": "stack-help",
+      "kind": "skill",
+      "summary": "Print the task-ordered map of every stack command available at this repo's tier \u2014 start a session, plan work, ship work, end a session, configure, diagnose.",
+      "invocation": {
+        "slash": "/stack-help",
+        "natural_language": "print the task-ordered map of every stack command available at this repo's tier \u2014 start a session, plan work, ship work, end a session, configure, diagnose"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "stack-self-update",
+      "kind": "hook",
+      "summary": "SessionStart hook \u2014 probes stack freshness and stages (fetch-only) a pin-verified update into the source repo's refs; NEVER applies, NEVER writes into ~/.claude (ADR-086 D1-D6, D13, D16-D20).",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/stack-self-update.sh",
+        "events": [
+          "SessionStart"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "stack-update",
+      "kind": "skill",
+      "summary": "Show what the self-update hook staged for the stack (commits behind, changed subjects, the pinned remote) and, on a yes, write the one consent token the post-consent applier hook needs to promote it on your next message.",
+      "invocation": {
+        "slash": "/stack-update",
+        "natural_language": "show what the self-update hook staged for the stack (commits behind, changed subjects, the pinned remote) and, on a yes, write the one consent token the post-consent applier hook needs to promote it on your next message"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": true
+    },
+    {
+      "id": "stack-update-apply",
+      "kind": "hook",
+      "summary": "UserPromptSubmit hook \u2014 the applier. Validates a human-authored consent file and promotes an already-staged, pin-verified SHA with NO network call (ADR-086 D2, D13 apply, D15, D17).",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/stack-update-apply.sh",
+        "events": [
+          "UserPromptSubmit"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "statusline",
+      "kind": "hook",
+      "summary": "Emits a statusline chip showing orchestration mode, tier, strict/permissive, and domain from stack-config.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/statusline.sh",
+        "events": [
+          "statusLine"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "stop-failure-log",
+      "kind": "hook",
+      "summary": "Logs API-error session terminations to the shared reliability log, without ever contributing a cost row.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 1,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/stop-failure-log.sh",
+        "events": [
+          "StopFailure"
+        ],
+        "matchers": [],
+        "wired_in": [
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "strict-mode",
+      "kind": "skill",
+      "summary": "Shortcut to toggle foreman's strict mode for the current project.",
+      "invocation": {
+        "slash": "/strict-mode",
+        "natural_language": "shortcut to toggle foreman's strict mode for the current project"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "subagent-complete-log",
+      "kind": "hook",
+      "summary": "Logs subagent completion (success/failure, wall time) as JSONL, pairing with subagent-log.sh's dispatch row.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/subagent-complete-log.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Agent"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "subagent-log",
+      "kind": "hook",
+      "summary": "Logs every subagent dispatch as JSONL, powering /team-status and team-utilization reporting.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/subagent-log.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Agent"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "suggest",
+      "kind": "skill",
+      "summary": "Suggest which stack skills or subagents apply to the current task.",
+      "invocation": {
+        "slash": "/suggest",
+        "natural_language": "suggest which stack skills or subagents apply to the current task"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "sweep",
+      "kind": "skill",
+      "summary": "Run the Sweep \u2014 pick a cadence (default manual), invoke ~/.claude/scripts/sweep/sweep-run.sh, render the G7 plain-English block via ~/.claude/scripts/sweep/sweep-render.sh.",
+      "invocation": {
+        "slash": "/sweep",
+        "natural_language": "run the Sweep \u2014 pick a cadence (default manual), invoke ~/.claude/scripts/sweep/sweep-run.sh, render the G7 plain-English block via ~/.claude/scripts/sweep/sweep-render.sh"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "team-init",
+      "kind": "skill",
+      "summary": "Scaffold the org admin repo that auto-installs the Claude Code Stack cloud bootstrap across a GitHub org/team.",
+      "invocation": {
+        "slash": "/team-init",
+        "natural_language": "scaffold the org admin repo that auto-installs the Claude Code Stack cloud bootstrap across a GitHub org/team"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "team-status",
+      "kind": "skill",
+      "summary": "Show which subagents have been getting work, which are benched, and (with --replan) propose how to bring benched roles into the current work.",
+      "invocation": {
+        "slash": "/team-status",
+        "natural_language": "show which subagents have been getting work, which are benched, and (with --replan) propose how to bring benched roles into the current work"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "tester",
+      "kind": "subagent",
+      "summary": "Writes the durable test suite.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "writes the durable test suite"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "tier",
+      "kind": "skill",
+      "summary": "Shortcut to view or change the project's stack tier (0-5).",
+      "invocation": {
+        "slash": "/tier",
+        "natural_language": "shortcut to view or change the project's stack tier (0-5)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "todo",
+      "kind": "skill",
+      "summary": "Show the open todo list mid-session \u2014 improvement-queue top items plus the current handoff's exact next steps, in one read-only view that says so when a source is unreachable instead of going silent.",
+      "invocation": {
+        "slash": "/todo",
+        "natural_language": "show the open todo list mid-session \u2014 improvement-queue top items plus the current handoff's exact next steps, in one read-only view that says so when a source is unreachable instead of going silent"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "ultracode",
+      "kind": "skill",
+      "summary": "Session-scoped risk dial that raises the loop autonomy ceiling one level above the tier default (capped at bounded-autonomous) and is read by the ADR-021 design-before-code gate.",
+      "invocation": {
+        "slash": "/ultracode",
+        "natural_language": "session-scoped risk dial that raises the loop autonomy ceiling one level above the tier default (capped at bounded-autonomous) and is read by the ADR-021 design-before-code gate"
+      },
+      "tier_min": 2,
+      "user_invocable": true,
+      "model_invocable": false,
+      "recommendable": true
+    },
+    {
+      "id": "usage-check-gate",
+      "kind": "hook",
+      "summary": "Blocks dispatching architect/red-team/reviewer unless every declared usage-check target has a fresh, re-verified token.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/usage-check-gate.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Agent",
+          "Task"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "usage-check-token",
+      "kind": "hook",
+      "summary": "Mints a per-target usage-check token from a genuine scripts/usage-check.sh run observed in Bash output.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/usage-check-token.sh",
+        "events": [
+          "PostToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    },
+    {
+      "id": "user-docs",
+      "kind": "skill",
+      "summary": "Author screenshot-backed end-user guides.",
+      "invocation": {
+        "slash": "/user-docs",
+        "natural_language": "author screenshot-backed end-user guides"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "user-docs-logic",
+      "kind": "skill",
+      "summary": "Extract a plain-language logic doc for one user-visible computed value (formula, pricing/savings/scoring calc, aggregation shown in the UI) under the producer-independent trust architecture from ADR-050 -- entry-point evidence closure, real-entry-point execution, and an adversarial parity gate that re-executes the harness and never trusts the producer's own file.",
+      "invocation": {
+        "slash": "/user-docs-logic",
+        "natural_language": "extract a plain-language logic doc for one user-visible computed value (formula, pricing/savings/scoring calc, aggregation shown in the UI) under the producer-independent trust architecture from ADR-050 -- entry-point evidence closure, real-entry-point execution, and an adversarial parity gate that re-executes the harness and never trusts the producer's own file"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "user-docs-refresh",
+      "kind": "skill",
+      "summary": "Check committed user guides against the live app by replaying their Playwright docs-tests, then classify any changed screenshots with a dedicated freshness prompt.",
+      "invocation": {
+        "slash": "/user-docs-refresh",
+        "natural_language": "check committed user guides against the live app by replaying their Playwright docs-tests, then classify any changed screenshots with a dedicated freshness prompt"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "user-docs-writer",
+      "kind": "subagent",
+      "summary": "Writes genuinely user-facing documentation \u2014 onboarding guides, feature walkthroughs, help-center articles \u2014 by walking the live app via Playwright and reading the real code.",
+      "invocation": {
+        "slash": null,
+        "natural_language": "writes genuinely user-facing documentation \u2014 onboarding guides, feature walkthroughs, help-center articles \u2014 by walking the live app via Playwright and reading the real code"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "using-superpowers",
+      "kind": "skill",
+      "summary": "The design-before-code operating discipline the ADR-021 gate enforces.",
+      "invocation": {
+        "slash": "/using-superpowers",
+        "natural_language": "the design-before-code operating discipline the ADR-021 gate enforces"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "validate-output",
+      "kind": "skill",
+      "summary": "Use AFTER implementing financial code or anything where output VALUES matter (not just shapes).",
+      "invocation": {
+        "slash": "/validate-output",
+        "natural_language": "use AFTER implementing financial code or anything where output VALUES matter (not just shapes)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "validator",
+      "kind": "subagent",
+      "summary": "Runs the code with real or representative data and asserts that output values match expectations (not just shapes).",
+      "invocation": {
+        "slash": null,
+        "natural_language": "runs the code with real or representative data and asserts that output values match expectations (not just shapes)"
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "value-check",
+      "kind": "skill",
+      "summary": "Score a target repo's ratified business-value claims against reality (proposal docs/proposals/2026-07-30-business-value-real-build-v2.md).",
+      "invocation": {
+        "slash": "/value-check",
+        "natural_language": "score a target repo's ratified business-value claims against reality (proposal docs/proposals/2026-07-30-business-value-real-build-v2.md)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "vendor-egress-cloud-guard",
+      "kind": "hook",
+      "summary": "Cloud-only, class-C PreToolUse[Bash] guard against denied vendor hosts and denyWrite-listed paths (ADR-071 D17).",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 0,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/vendor-egress-cloud-guard.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Bash"
+        ],
+        "wired_in": [
+          "config/settings.global.template.json"
+        ]
+      }
+    },
+    {
+      "id": "walkthrough",
+      "kind": "skill",
+      "summary": "Family G2 human-instrument skill (the Sweep, stack ADR-078).",
+      "invocation": {
+        "slash": "/walkthrough",
+        "natural_language": "family G2 human-instrument skill (the Sweep, stack ADR-078)"
+      },
+      "tier_min": 0,
+      "user_invocable": true,
+      "model_invocable": true,
+      "recommendable": true
+    },
+    {
+      "id": "workflow-roster-check",
+      "kind": "hook",
+      "summary": "Warns or blocks when a Workflow run bypasses the named subagent roster, per the workflow_roster setting.",
+      "invocation": {
+        "slash": null,
+        "natural_language": null
+      },
+      "tier_min": 2,
+      "user_invocable": false,
+      "model_invocable": false,
+      "recommendable": false,
+      "hook": {
+        "path": "hooks/workflow-roster-check.sh",
+        "events": [
+          "PreToolUse"
+        ],
+        "matchers": [
+          "Workflow"
+        ],
+        "wired_in": [
+          "config/settings.team.template.json",
+          "hooks/hooks.json"
+        ]
+      }
+    }
+  ],
+  "aliases": {
+    "bye": "carbonight",
+    "docs": "handbook",
+    "goodbye": "carbonight",
+    "hello": "goodmorning",
+    "hi": "goodmorning"
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/tenant-pack-schema.json",
+  "title": "Tenant Pack Manifest",
+  "description": "Validates tenant.json at the root of a tenant pack repo (ADR-034 §3). Consumed by install.sh --pack (landing + compose), /project-init (tenant assembly), and the provisioner. Normative documentation + pack-repo CI; runtime checks are jq-based (no schema-validator dependency).",
+  "type": "object",
+  "required": ["tenant_id", "pack_version", "github"],
+  "properties": {
+    "tenant_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,62}$",
+      "description": "Stable tenant slug. Names the landing dir ~/.claude/packs/<tenant_id>/; written into project stack-config.json by /project-init; keys reconciler PRs."
+    },
+    "pack_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver of this pack's content. Stamped into .pack-install.json and stack-defaults.json tenant_pack; keys reconciler PR delivery (ADR-034 §5)."
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Human-readable tenant name for banners and provisioner output."
+    },
+    "github": {
+      "type": "object",
+      "required": ["org"],
+      "description": "GitHub settings the provisioner uses when creating tenant repos.",
+      "properties": {
+        "org": {
+          "type": "string",
+          "description": "GitHub org new tenant repos are created under."
+        },
+        "merge_policy": {
+          "type": "string",
+          "enum": ["squash", "merge", "rebase"],
+          "default": "squash",
+          "description": "Merge method the provisioner configures on new repos' branch protection."
+        }
+      },
+      "additionalProperties": false
+    },
+    "database": {
+      "type": "object",
+      "description": "Tenant database defaults, consumed by /database-design and the provisioner.",
+      "properties": {
+        "default": {
+          "type": "string",
+          "enum": ["neon", "supabase"],
+          "default": "neon",
+          "description": "Default database provider for new tenant projects."
+        },
+        "supabase_conditions": {
+          "type": "string",
+          "description": "Prose: conditions under which Supabase applies instead of the default. Surfaced in the /database-design decision prompt."
+        }
+      },
+      "additionalProperties": false
+    },
+    "clerk": {
+      "type": "object",
+      "description": "Tenant Clerk auth settings, consumed by the provisioner and /clerk-auth.",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "description": "Auth strategy note consumed by /clerk-auth."
+        },
+        "publishable_key": {
+          "type": "string",
+          "pattern": "^pk_(test|live)_",
+          "description": "Clerk publishable key (publishable — allowed in a pack; secret keys are NEVER pack content, ADR-035)."
+        },
+        "org_id": {
+          "type": "string",
+          "description": "Clerk organization id the provisioner wires new apps to."
+        }
+      },
+      "additionalProperties": false
+    },
+    "deploy": {
+      "type": "object",
+      "description": "Tenant deploy defaults, consumed by the provisioner.",
+      "properties": {
+        "default": {
+          "type": "string",
+          "enum": ["cloudflare"],
+          "default": "cloudflare",
+          "description": "Deploy target. Single-value enum on purpose — widen when a second target exists."
+        },
+        "cloudflare": {
+          "type": "object",
+          "description": "Cloudflare deploy settings consumed by secret-binder (ADR-035). The Secrets Store id is deliberately NOT a field here — account id and store id are distinct 32-hex values, and the store id is always resolved live via the list-stores API.",
+          "properties": {
+            "account_id": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{32}$",
+              "description": "Tenant's Cloudflare account id (NOT the Secrets Store id)."
+            },
+            "api_token_keychain_item": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._-]+$",
+              "description": "macOS Keychain item name holding the tenant API token — secret-binder's local fallback when <TENANT>_API_TOKEN is not in env. Names an item, never a value."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "engine_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Tenant recommend-capabilities engine endpoint, consumed by engine hooks."
+    },
+    "design_tokens_path": {
+      "type": "string",
+      "description": "Pack-relative path to the tenant design tokens, consumed by /screenshot-diff, UI skills, and /project-init vendoring."
+    },
+    "standards": {
+      "type": "object",
+      "description": "Map of standard name to pack-relative path. NOT installed globally — /project-init vendors these into each repo as committed files (ADR-034 §4).",
+      "additionalProperties": { "type": "string" }
+    },
+    "ci_templates": {
+      "type": "object",
+      "description": "Map of template name to {source, dest}: source is a pack-relative CI template file, dest is its destination path in the consuming project (e.g. .github/workflows/run_tests.yml). NOT installed globally — /project-init vendors these into each repo as committed files, the same delivery mechanism as `standards` (ADR-034 §4), except the destination is pack-declared rather than reusing the source's own relative path (a pack's CI template rarely lives at the same relative path it is delivered to).",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["source", "dest"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Pack-relative path to the CI template file, e.g. templates/run_tests.yml."
+          },
+          "dest": {
+            "type": "string",
+            "description": "Repo-relative destination path in the consuming project, e.g. .github/workflows/run_tests.yml."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "claude_fragment_path": {
+      "type": "string",
+      "default": "CLAUDE.fragment.md",
+      "description": "Pack-relative path to the org CLAUDE.md fragment. pack-installer applies it to the global CLAUDE.md ORG_OVERLAY_MANAGED region; /project-init uses it for project CLAUDE.md assembly."
+    },
+    "gemini_generator": {
+      "type": "boolean",
+      "default": false,
+      "description": "Toggles the Gemini-powered generator skill for this tenant."
+    },
+    "secrets": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+      "uniqueItems": true,
+      "description": "Secret NAMES only, never values (ADR-034, ADR-035 §5). Provisioner resolves each name to a Cloudflare Secrets Store id and emits wrangler bindings."
+    },
+    "account_model": {
+      "type": "string",
+      "enum": ["org-owned", "user-owned"],
+      "description": "Provisioning design v2 §1.1/§11 decision 1: whether this tenant's /provision-created resources are billed and owned by the tenant org, or by the end user. Generic field -- no default here, so no tenant's value is assumed for another. Only org-owned is implemented by the provisioner today; a pack declaring user-owned means assisted-mode write phases refuse until that path is built."
+    },
+    "escalation": {
+      "type": "object",
+      "description": "Provisioning design v2 §3: the escalation path /provision assisted mode uses for any refusal, capability gap, or mid-run failure. A tenant pack must declare this for assisted mode to be available at all (assisted mode refuses to run write phases without it, §1.2).",
+      "required": ["channel"],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": ["github-issue"],
+          "description": "Escalation channel. Only github-issue is implemented (§11 decision 2). Deliberately an enum of one today rather than a free string, so a second channel (e.g. a Slack/email webhook, §11 decision 2 option b) is added by widening this enum -- no reshape of the object needed."
+        },
+        "repo": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$",
+          "description": "org/repo of the ops-queue repo escalation issues are filed against. Required when channel is github-issue."
+        },
+        "assignees": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "description": "GitHub handles of operators the escalation issue is assigned to."
+        },
+        "fallback_contact": {
+          "type": "object",
+          "description": "Plain-words human fallback shown to the colleague when the channel itself can't be reached (§3.1 step 5) -- e.g. the issue can't be filed. Still zero technical action required of the colleague.",
+          "required": ["name", "how"],
+          "properties": {
+            "name": { "type": "string", "description": "Plain name of the fallback human contact." },
+            "how": { "type": "string", "description": "Plain words for how to reach them, e.g. 'email' or 'phone' -- never a technical URL or command." }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "if": {
+        "properties": { "channel": { "const": "github-issue" } }
+      },
+      "then": {
+        "required": ["channel", "repo"]
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Provisioning design v2 §6 fix 4: pack provenance pinning. Declares the canonical private git source this pack must be installed from. This is a self-declared, install-time CONSISTENCY check, not a security boundary on its own -- a compromised pack repo is upstream of it (§10.4 residual); the real boundary is pack-repo access control. The installer (scripts/lib/project-pack-vendor.sh / pack-installer.sh) compares the source it actually fetched from against this pin and refuses a mismatch; that comparison logic is a later build phase, not part of this schema addition. Commit-SHA pinning deliberately lives on the INSTALL RECORD side (already captured as tenant_pack.sha in the composed stack-defaults.json, per pack-installer.sh's compose step), not here -- a pack cannot declare its own future commit.",
+      "required": ["source_url"],
+      "properties": {
+        "source_url": {
+          "type": "string",
+          "description": "Canonical (pinned) private git source this pack must be installed from, e.g. git@github.com:<org>/<pack-repo>.git. A pack whose recorded install source does not match this value is refused."
+        },
+        "pinned_ref": {
+          "type": "string",
+          "description": "Optional pinned git ref (branch or tag) the pack is expected to track. Absent means any ref off source_url is accepted."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": { "secrets": { "minItems": 1 } },
+    "required": ["secrets"]
+  },
+  "then": {
+    "properties": {
+      "deploy": {
+        "properties": {
+          "cloudflare": { "required": ["account_id"] }
+        },
+        "required": ["cloudflare"]
+      }
+    },
+    "required": ["deploy"]
+  }
+}

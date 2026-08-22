@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-rollouts.json",
+  "title": "Stack Rollouts Declaration",
+  "description": "stack-rollouts/v1 (ADR-087 D7). config/rollouts.json -- the declared universe of fleet-scoreboard rollouts. Committed, human-authored. Read by scripts/rollout-verify.sh. Five probe types and no more: file_present, file_sha, settings_json, receipt_field, floor_glob.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "rollouts"],
+  "properties": {
+    "schema": { "type": "string", "enum": ["stack-rollouts/v1"] },
+    "rollouts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "since_stack_version", "applies_to", "probes"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "title": { "type": "string", "maxLength": 200 },
+          "since_stack_version": { "type": "string" },
+          "applies_to": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["config_dirs"],
+            "properties": {
+              "config_dirs": { "type": "string", "enum": ["all", "master"] }
+            }
+          },
+          "probes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": { "type": "string", "enum": ["file_present", "file_sha", "settings_json", "receipt_field", "floor_glob"] },
+                "path": { "type": "string" },
+                "sha": { "type": "string", "pattern": "^[0-9a-f]{40,64}$" },
+                "jq": { "type": "string" },
+                "glob": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

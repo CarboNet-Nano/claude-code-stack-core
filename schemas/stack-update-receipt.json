@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-update-receipt.json",
+  "title": "Stack Update Receipt",
+  "description": "stack-update/v1 (ADR-086 D5). The single, machine-global receipt written by hooks/stack-self-update.sh and hooks/stack-update-apply.sh at <conf>/state/stack-update/receipt.json. Only trustworthy because that path is denyWrite-protected (ADR-086 D17) -- a model-writable receipt could forge status:current, the exact lie ADR-085 exists to prevent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "hook_version",
+    "as_of",
+    "status",
+    "reason",
+    "needs_human"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["stack-update/v1"],
+      "description": "Schema identifier and version tag. Always the literal string stack-update/v1."
+    },
+    "hook_version": {
+      "type": "integer",
+      "description": "The revision of ADR-086 that wrote this receipt. Rev 3 ships 3."
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO-8601 timestamp of the run that produced this receipt. If older than 12h, the hook did not run this boot (ADR-085 couldn't-look)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["current", "staged", "applying", "updated", "running", "blocked", "failed", "skipped"],
+      "description": "Closed, eight-value vocabulary (ADR-086 D5). No ninth value without an ADR."
+    },
+    "reason": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "no-jq", "no-git", "no-stamp", "no-pin", "pin-outdated",
+        "unstamped-profile", "repo-missing", "malformed-stamp", "pin-mismatch",
+        "remote-mismatch", "offline", "fetch-error", "dirty", "detached",
+        "branch", "no-upstream", "not-ff", "stage-mismatch", "consent-stale",
+        "consent-expired", "unsafe-state-dir", "backoff", "exit-nonzero",
+        "partial", "stuck", "cooldown", "status-unknown", "operation-in-progress"
+      ],
+      "description": "Required (non-null) whenever status is skipped|blocked|failed. Closed, 28-value vocabulary. status-unknown: `git status` itself failed, so cleanliness could not be determined -- distinct from `dirty`, because 'could not look' must never be recorded as 'looked and it was fine' (ADR-085's rule). operation-in-progress: an unfinished merge, cherry-pick, revert or rebase is present; the tree can be clean while the repository is mid-operation, and a fast-forward would fail."
+    },
+    "session_id": {
+      "type": ["string", "null"],
+      "description": "From the hook payload. Debugging only."
+    },
+    "repo": { "type": ["string", "null"], "description": "The canonical source repo path." },
+    "remote_url": { "type": ["string", "null"], "description": "The pin's remote_url, echoed for display." },
+    "tier": { "type": ["integer", "null"] },
+    "branch": { "type": ["string", "null"], "description": "HEAD of the source repo at probe time." },
+    "source_branch": { "type": ["string", "null"], "description": "From the install stamp." },
+    "behind_before": { "type": ["integer", "null"] },
+    "behind_after": { "type": ["integer", "null"] },
+    "staged_sha": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The fetched tip, full 40-hex. The integrity anchor for staging (ADR-086 D13)."
+    },
+    "staged_at": { "type": ["string", "null"], "format": "date-time" },
+    "staged_count": { "type": ["integer", "null"] },
+    "staged_subjects": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "type": "string", "maxLength": 100 },
+      "description": "Up to 5 commit subjects, each sanitized per D19 and truncated to 100 chars."
+    },
+    "from_sha": { "type": ["string", "null"] },
+    "to_sha": { "type": ["string", "null"] },
+    "duration_ms": { "type": ["integer", "null"] },
+    "log": { "type": ["string", "null"] },
+    "error": {
+      "type": ["string", "null"],
+      "maxLength": 200,
+      "description": "Sanitized per D19 at write time. Never an empty string on the dev face."
+    },
+    "needs_human": {
+      "type": "boolean",
+      "description": "true iff status==failed or reason in {dirty, branch, detached, no-upstream, not-ff, partial, pin-mismatch, remote-mismatch, stuck}."
+    },
+    "profile_dir": { "type": ["string", "null"], "description": "Only set when reason==unstamped-profile." },
+    "consecutive_offline": { "type": "integer", "minimum": 0 },
+    "pack_pending": { "type": "boolean" },
+    "purges_pending": { "type": "integer", "minimum": 0 },
+    "fail_sha": { "type": ["string", "null"], "description": "The staged_sha that last failed to apply (D20)." },
+    "consecutive_failures": { "type": "integer", "minimum": 0 },
+    "retry_after": { "type": ["string", "null"], "format": "date-time", "description": "Staging is skipped for fail_sha until this time (D20)." },
+    "deadline_degraded": { "type": "boolean", "description": "true when no process-group kill tool (setsid/perl) was available (D18)." }
+  }
+}

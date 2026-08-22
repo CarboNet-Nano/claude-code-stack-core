@@ -1,0 +1,45 @@
+# Sweep liveness — the ONE authorised edit to a repo's existing
+# required `run-tests.yml` (stack ADR-078, spec
+# docs/superpowers/specs/2026-08-15-sweep-design.md S4.1 CI required
+# half, S4.6 B5, S7.3). Paste this single job under the `jobs:` key of
+# your existing run-tests.yml. Do not add it as its own workflow file
+# — B5's whole point is that it rides an ALREADY-required workflow, so
+# a non-required sweep.yml being deleted, path-filtered around, or
+# never wired up still shows red where it matters.
+#
+# Asserts a templates/workflows/sweep.yml run exists for this head
+# sha, concluded, and produced one result envelope (the sweep-run/v1
+# `--json` line, S4.1 producer contract, task 8) per check id in the
+# installed inventory minus the repo's reason-carrying skips. Blocking
+# from day one (decision 6, S4.6) — independent of the graduation
+# ladder, and it has no opinion on findings.
+#
+# {{STACK_REF}}: same placeholder templates/workflows/sweep.yml uses —
+# the pinned claude-code-stack git ref this repo is installed against.
+# Substituted by the stack installer (task 11) at install time.
+
+  sweep-liveness:
+    name: sweep-liveness (required — B5, blocks from day one)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout stack scripts (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: get-lade/claude-code-stack
+          ref: "{{STACK_REF}}"
+          ssh-key: ${{ secrets.SWEEP_STACK_DEPLOY_KEY }}
+          path: .sweep-stack
+
+      - name: Assert the Sweep actually ran (B5)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          .sweep-stack/scripts/sweep/sweep-liveness.sh \
+            --head-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --repo "$GITHUB_WORKSPACE"

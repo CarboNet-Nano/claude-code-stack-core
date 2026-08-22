@@ -1,0 +1,254 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/sweep-config.json",
+  "title": "Sweep Config",
+  "description": "sweep-config/v1 (stack ADR-078 spec S5.3, phase 1). Per-repo config declaring which Sweep families run, at what mode, and with what reasoned exclusions/skips. There is no `enabled` key anywhere in this schema [RT-5] - presence of a family block means the check runs; the only way to not run a check is a `skips` entry with a reason. Phase 1 ships only mode/check_modes/surfaces/families/skips and the A1/A2/A4/E1/B3/B4 family blocks, plus PC1 (2026-08-18 new-user-setup-rev2 plan, task 6 - vendored portable-core skill drift, ADR-075; not one of the spec\u2019s phase-1-3 A-G families, added on top). PC1 must be declarable: it is in the shared scripts/sweep/inventory.txt, so a repo with no legal way to declare it would find its required B5 gate reddening at every stack-pin bump with no remedy but skips-forever. `connections` and the C2/C3/D0a/D0b blocks are added in the phase they are first used (spec S4.4 scope discipline).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "mode", "check_modes", "surfaces", "families", "skips"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["sweep-config/v1"],
+      "description": "Schema identifier and version tag for this config. Always the literal string sweep-config/v1."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["observe", "warn", "block"],
+      "description": "Global ceiling mode. No check_modes entry may sit above this ladder level."
+    },
+    "check_modes": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "enum": ["observe", "warn", "block"] },
+      "description": "Per-check mode overrides, keyed by check id. Never above the ladder's earned level (mode)."
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": [
+          "write-path",
+          "read-path",
+          "schema",
+          "ci-gate",
+          "ui-route",
+          "scheduled-job",
+          "external-integration",
+          "scale",
+          "docs"
+        ]
+      },
+      "description": "System surface classification per declared check id. Required per declared check (spec S5.3). Values reuse the closed enum from finding-record.json's surface field, minus null (a config declaration is never unset)."
+    },
+    "families": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Phase-1 family blocks only. Presence of a block means the check runs; there is no enabled key.",
+      "properties": {
+        "A1": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["writer_globs", "exclusions"],
+          "properties": {
+            "writer_globs": { "type": "array", "items": { "type": "string" } },
+            "exclusions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["unit", "reason"],
+                "properties": {
+                  "unit": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        "A2": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["producers", "consumer_globs", "exclusions"],
+          "properties": {
+            "producers": { "type": "array", "items": { "type": "string" } },
+            "consumer_globs": { "type": "array", "items": { "type": "string" } },
+            "exclusions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["unit", "reason"],
+                "properties": {
+                  "unit": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        "A4": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tables", "write_path_globs", "write_never"],
+          "properties": {
+            "tables": { "type": "array", "items": { "type": "string" } },
+            "write_path_globs": { "type": "array", "items": { "type": "string" } },
+            "write_never": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["unit", "reason"],
+                "properties": {
+                  "unit": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            },
+            "migrations_glob": {
+              "type": "string",
+              "minLength": 1,
+              "description": "OPTIONAL. Glob (a directory plus a single `*` basename pattern) the column universe is parsed from - CREATE TABLE / ALTER TABLE ADD COLUMN statements for the declared tables (spec S4.6 A4's degraded, static-source universe). Defaults to \"supabase/migrations/*.sql\" when absent."
+            }
+          }
+        },
+        "A5": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["command_map", "interface_files", "exclusions", "min_expected_commands"],
+          "description": "command-has-interface-caller (audit #4, ADR-082 P1a). command_map is a single \"path#exportSymbol\" anchored entry (A2's shape) naming the exported object literal whose top-level string keys ARE the derived universe of command ids - never a hand-kept id list. exclusions is keyed `id`, not `unit` (this family's own stated shape).",
+          "properties": {
+            "command_map": { "type": "string", "minLength": 1 },
+            "interface_files": { "type": "array", "items": { "type": "string" } },
+            "exclusions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "reason"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            },
+            "min_expected_commands": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Universe floor. An extracted command-id count below this is a liveness failure (status: error) - an extraction pattern that cannot resolve the map (e.g. dynamic/computed keys) never fakes a smaller universe."
+            }
+          }
+        },
+        "E1": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["app", "route_manifest_cmd", "base_url_env", "exclusions"],
+          "properties": {
+            "app": { "type": "string" },
+            "route_manifest_cmd": { "type": "string" },
+            "base_url_env": { "type": "string" },
+            "exclusions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["unit", "reason"],
+                "properties": {
+                  "unit": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        "B3": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["jobs"],
+          "properties": {
+            "jobs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "expected_effect_sql", "min_rows"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "expected_effect_sql": { "type": "string" },
+                  "min_rows": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "B4": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "empty_universe_ok": {
+              "type": "string",
+              "minLength": 1,
+              "description": "OPTIONAL, B4 only. B4's universe is every commit that landed on main in the last 30 days (first-parent). A repo that genuinely had no landings in that window reports universe_size 0, which invariant 2 (default-closed) turns into a liveness failure - correct for a check whose selection broke, wrong for a quiet repo. Declaring this key makes universe 0 a LEGAL SKIP for B4, recorded with this reason. It is a string and never a boolean: the reason is the entire point, and a boolean here would be the `enabled` flag wearing a new name [RT-5]. Absent, universe 0 stays exit 2."
+            }
+          },
+          "description": "B4 (a commit landing on main produces a push-triggered run). Only optional key is empty_universe_ok."
+        },
+        "PC1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {},
+          "description": "PC1 (vendored .claude/skills/ portable-core copies drifted from config/portable-core-manifest.json, ADR-075). No GitHub API knobs, no app knobs - it reads the manifest and the repo's own .claude/skills/ tree, both local. Declared with an empty object, the same minimal shape B4 uses when empty_universe_ok is not needed."
+        },
+        "W1": {
+          "type": "object",
+          "description": "W1 (surface walk): drives a real browser over a deployed STAGING app and asserts one declared behaviour per control. Outside the A-G family lettering, following PC1's precedent; found_by is sweep-family-E because W1 extends E1's machinery. Reuses E1's adapter seam verbatim - base_url_env, route_manifest_cmd, exclusions - and adds walk_manifest.",
+          "additionalProperties": false,
+          "required": ["base_url_env", "route_manifest_cmd", "walk_manifest"],
+          "properties": {
+            "base_url_env": { "type": "string", "description": "Name of the environment variable holding the STAGING base URL. Never production: W1 clicks things, and a click in the pilot repo can approve a bill." },
+            "route_manifest_cmd": { "type": "string", "description": "A command printing one route per line. The same adapter seam E1 uses [RT-9]." },
+            "walk_manifest": { "type": "string", "description": "Repo-relative path to the walk manifest: per screen, the controls and one assertion verb each." },
+            "exclusions": {
+              "type": "array",
+              "description": "Screens excluded from the walk, each with a stated reason. Same shape as E1's.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["unit", "reason"],
+                "properties": {
+                  "unit": { "type": "string" },
+                  "reason": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "detection_cadence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner"],
+      "description": "OPTIONAL. Scheduled human-instrument cadence (stack ADR-082 P1e): .github/workflows/detection-cadence.yml creates a fortnightly walkthrough-due issue and a monthly cross-family-review-due issue, both through the queue's single writer (scripts/improvement-queue.sh). Absence of this block is a clean no-op, not an error - the workflow never creates a cadence issue without a configured owner.",
+      "properties": {
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "description": "GitHub login the detection-cadence workflow assigns cadence issues to."
+        }
+      }
+    },
+    "skips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "reason"],
+        "properties": {
+          "check_id": { "type": "string" },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

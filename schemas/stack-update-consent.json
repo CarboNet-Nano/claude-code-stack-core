@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/stack-update-consent.json",
+  "title": "Stack Update Consent",
+  "description": "stack-update-consent/v1 (ADR-086 D15). Written by the model at <conf>/state/stack-consent/stack-update.json after a human answers yes to the D14 prompt. Deliberately writable by the model -- forgery is harmless by construction (D15): it can only cause the org's own, already-staged, pin-verified update to apply.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "staged_sha", "granted_at", "session_id"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["stack-update-consent/v1"],
+      "description": "Schema identifier and version tag. Always the literal string stack-update-consent/v1."
+    },
+    "staged_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-hex. Must equal the receipt's staged_sha at apply time or the applier refuses (blocked/consent-stale)."
+    },
+    "granted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC. Must be within 900s (15 minutes) of the applier's read, or the applier refuses (blocked/consent-expired)."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Must equal the applier hook payload's session_id, or the applier refuses (blocked/consent-stale)."
+    },
+    "door": {
+      "type": "string",
+      "enum": ["goodmorning", "stack-update"],
+      "description": "Display only -- which of the two doors (D14) wrote this consent."
+    }
+  }
+}

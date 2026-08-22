@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bschonbrun/claude-code-stack/schemas/attribution-record.json",
+  "title": "Attribution Record",
+  "description": "attribution-record/v1 (stack ADR-079, roster-keeper spec §5.5). Append-only rows in <repo>/.claude/sweep/attributions.jsonl, foreign-keyed by finding_id. Each pipeline stage appends a complete new record, never a patch; readers take the highest seq per finding_id. Cross-record invariants (R1/R2, the none_reason rule, the production-data fence) are enforced by roster-keeper.sh validate, fail-closed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "finding_id",
+    "repo",
+    "stage",
+    "seq",
+    "created_at",
+    "responsible_agent_candidates",
+    "ownership_map_version",
+    "cell_provisional",
+    "surface_source"
+  ],
+  "properties": {
+    "schema": { "type": "string", "enum": ["attribution-record/v1"] },
+    "finding_id": { "type": "string", "minLength": 1 },
+    "repo": { "type": "string", "minLength": 1 },
+    "stage": { "type": "string", "enum": ["stamped", "attributed", "adjudicated", "applied"] },
+    "seq": { "type": "integer", "minimum": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "responsible_agent_candidates": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Copied from the ownership map cell at stamp time; [] is legal (a known-gap or unset-surface cell)."
+    },
+    "ownership_map_version": { "type": "integer", "minimum": 1 },
+    "cell_provisional": { "type": "boolean" },
+    "surface_source": {
+      "type": "string",
+      "enum": ["check", "human", "unset"],
+      "description": "Never 'roster-keeper' — the keeper may not classify a missing surface (spec §3)."
+    },
+    "responsible_agent": {
+      "type": ["string", "null"],
+      "description": "One of the stamped candidates, or the literal 'none', or null (not yet attributed / R2-invalidated)."
+    },
+    "none_reason": {
+      "type": ["string", "null"],
+      "enum": ["unowned", "nearest-fit", "disagreement", null],
+      "description": "Required iff responsible_agent == 'none'. Only 'unowned' counts toward the new-agent bar."
+    },
+    "attribution_note": { "type": ["string", "null"], "maxLength": 200 },
+    "attributed_by": {
+      "type": ["string", "null"],
+      "description": "roster-keeper | human | cross-family:<model>. Written at answer time, never reconstructed (R1)."
+    },
+    "attribution_route": {
+      "type": ["string", "null"],
+      "enum": ["normal", "cross-family-required", null]
+    },
+    "adjudication_blind": {
+      "type": ["boolean", "null"],
+      "description": "false ⇒ the record cannot render (R3). Set by the adjudication step only."
+    },
+    "disagreement": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "family": { "type": "string" },
+        "agent": { "type": "string" }
+      },
+      "required": ["family", "agent"],
+      "description": "Non-null ⇒ responsible_agent == 'none' and none_reason == 'disagreement' (R4)."
+    },
+    "roster_action": {
+      "type": ["string", "null"],
+      "enum": ["none", "prompt-change", "new-check", "new-agent", null]
+    },
+    "roster_action_ref": {
+      "type": ["string", "null"],
+      "description": "Check ID, agent name, or proposal path. Null iff roster_action is 'none' or null."
+    },
+    "roster_action_applied_sha": { "type": ["string", "null"] },
+    "roster_action_applied_at": { "type": ["string", "null"] }
+  }
+}
